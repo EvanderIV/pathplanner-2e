@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homebrew Catalog - TTRPG Suite</title>
+    <link rel="stylesheet" href="../css/index.css"> <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="top-bar">
+        <div class="logo">TTRPG Suite</div>
+        <nav>
+            <ul>
+                <li><a href="../">Home</a></li>
+                <li><a href="../campaign">Campaign Details</a></li>
+                <li><a href="../party">Party Management</a></li>
+                <li><a href="" class="active">Homebrew Catalog</a></li> <li><a href="../creature-generator">Creature Generator</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>Homebrew Catalog</h1>
+
+        <div class="catalog-controls-bar">
+            <div class="add-asset-container">
+                <button id="addNewHomebrewAssetBtn" class="btn">Add New Homebrew Asset</button>
+                <div id="customAddAssetDropdown" class="custom-dropdown-menu" style="display:none;">
+                    <a href="#" data-asset-type="creature">Creature</a>
+                    <a href="#" data-asset-type="item">Item</a>
+                    <a href="#" data-asset-type="spell">Spell</a>
+                </div>
+            </div>
+            <div class="sort-controls">
+                <label for="sortAssetsBy">Sort by:</label>
+                <select id="sortAssetsBy">
+                    <option value="alphabetical">Alphabetical</option>
+                    <option value="createdAt">Time of Creation</option>
+                    <option value="nameLength">Name Length</option>
+                </select>
+                <button id="reverseSortBtn" class="btn btn-small" title="Reverse Sort Order">↕</button>
+            </div>
+            <aside id="filterPanel" class="filter-panel-top">
+                <h2>Filter by Type</h2>
+                <div class="filter-options-container">
+                    <div class="filter-group">
+                        <input type="checkbox" id="filterCreature" data-filter-type="creature" checked>
+                        <label for="filterCreature">Creatures</label>
+                    </div>
+                    <div class="filter-group">
+                        <input type="checkbox" id="filterItem" data-filter-type="item" checked>
+                        <label for="filterItem">Items</label>
+                    </div>
+                    <div class="filter-group">
+                        <input type="checkbox" id="filterSpell" data-filter-type="spell" checked>
+                        <label for="filterSpell">Spells</label>
+                    </div>
+                </div>
+            </aside>
+        </div> <div id="homebrewAssetsContainer" class="homebrew-assets-columns">
+            </div>
+        
+        <button id="saveAllHomebrewBtn" class="btn btn-save-page" style="display:none;">Save All Changes</button> 
+        <p id="saveStatusHomebrew" class="save-status"></p>
+    </main>
+
+    <div id="newUserModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Welcome!</h2>
+            <p>It looks like you don't have any campaigns loaded.</p>
+            <div class="modal-actions">
+                <button id="createNewCampaignBtn" class="btn">Create New Campaign</button>
+                <button id="importCampaignBtn" class="btn btn-secondary">Import from File</button> </div>
+        </div>
+    </div>
+
+    <div id="editCreatureModal" class="modal large-modal"> 
+        <div class="modal-content">
+            <span class="close-edit-creature-modal-btn">&times;</span>
+            <h2 id="editCreatureModalTitle">Edit Creature</h2>
+            <div id="editCreatureModalBody">
+                <p>Creature editing form will load here. This will replicate the Creature Generator fields.</p>
+            </div>
+            <button id="saveEditedCreatureBtn" class="btn">Save Creature Changes</button>
+        </div>
+    </div>
+
+    <div id="deleteAssetConfirmModal" class="modal">
+        <div class="modal-content">
+            <span class="close-delete-asset-confirm-modal-btn">&times;</span>
+            <h2>Confirm Deletion</h2>
+            <p id="deleteAssetConfirmMessage">Are you sure you want to delete this asset?</p>
+            <div class="modal-actions">
+                <button id="confirmDeleteAssetBtn" class="btn btn-danger">Confirm Delete</button>
+                <button id="cancelDeleteAssetBtn" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="addNewItemModal" class="modal">
+        <div class="modal-content">
+            <span id="closeAddNewItemModalBtn" class="close-button">&times;</span>
+            <h2>Add New Homebrew Item</h2>
+            <form id="addNewItemForm">
+                <div class="form-group">
+                    <label for="newItemName">Item Name:</label>
+                    <input type="text" id="newItemName" required>
+                </div>
+                <div class="form-group">
+                    <label for="newItemDurability">Durability:</label>
+                    <input type="text" id="newItemDurability" placeholder="e.g., 10/10, Sturdy, Fragile">
+                </div>
+                <div class="form-group">
+                    <label for="newItemDescription">Description:</label>
+                    <textarea id="newItemDescription" rows="4" required></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" id="saveNewItemBtn" class="btn">Save Item</button>
+                    <button type="button" id="cancelNewItemBtn" class="btn btn-secondary">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="addNewSpellModal" class="modal">
+        <div class="modal-content">
+            <span id="closeAddNewSpellModalBtn" class="close-button">&times;</span>
+            <h2>Add New Homebrew Spell</h2>
+            <form id="addNewSpellForm">
+                <div class="form-group">
+                    <label for="newSpellName">Spell Name:</label>
+                    <input type="text" id="newSpellName" name="newSpellName" required>
+                </div>
+                <div class="form-group">
+                    <label for="newSpellRequiredLevel">Required Level:</label>
+                    <input type="text" id="newSpellRequiredLevel" name="newSpellRequiredLevel" placeholder="e.g., Cantrip, 1st, 5th-level">
+                </div>
+                <div class="form-group">
+                    <label for="newSpellDescription">Description:</label>
+                    <textarea id="newSpellDescription" name="newSpellDescription" rows="4" required></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn">Save Spell</button> <button type="button" id="cancelNewSpellBtn" class="btn btn-secondary">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 TTRPG Suite. All rights reserved. All code is open source.</p>
+    </footer>
+
+    <script src="js/index.js"></script> </body>
+</html>

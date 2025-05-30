@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - TTRPG Suite</title>
+    <link rel="stylesheet" href="css/index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="top-bar">
+        <div class="logo">TTRPG Suite</div>
+        <nav>
+            <ul>
+                <li><a href="" class="active">Home</a></li>
+                <li><a href="campaign">Campaign Details</a></li>
+                <li><a href="party">Party Management</a></li>
+                <li><a href="homebrew">Homebrew Catalog</a></li>
+                <li><a href="creature-generator">Creature Generator</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>Your Campaigns</h1>
+        <div id="campaignListContainer">
+            </div>
+        </main>
+
+    <div id="noCampaignsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Welcome!</h2>
+            <p>No campaigns found on your scroll!</p>
+            <p>Would you like to create a new one or try importing an existing adventure?</p>
+            <div class="modal-actions">
+                <button id="modalCreateNewCampaignBtn" class="btn">Create New Campaign</button>
+                <button id="modalImportCampaignBtn" class="btn btn-secondary">Import from File</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 TTRPG Suite. All rights reserved. This code is open source.</p>
+    </footer>
+
+    <script src="js/index.js"></script>
+</body>
+</html>

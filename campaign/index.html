@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campaign Details - TTRPG Suite</title>
+    <link rel="stylesheet" href="../css/index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="top-bar">
+        <div class="logo">TTRPG Suite</div>
+        <nav>
+            <ul>
+                <li><a href="../">Home</a></li>
+                <li><a href="" class="active">Campaign Details</a></li>
+                <li><a href="../party">Party Management</a></li>
+                <li><a href="../homebrew">Homebrew Catalog</a></li>
+                <li><a href="../creature-generator">Creature Generator</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>Campaign Details</h1>
+        <form id="campaignForm">
+            <div class="form-group">
+                <label for="campaignName">Campaign Name:</label>
+                <input type="text" id="campaignName" name="campaignName" required>
+            </div>
+
+            <div class="form-group">
+                <label for="campaignDescription">Description:</label>
+                <textarea id="campaignDescription" name="campaignDescription" rows="6"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="campaignGenre">Genre(s):</label>
+                <input type="text" id="campaignGenre" name="campaignGenre" placeholder="e.g., High Fantasy, Grimdark, Sci-Fi">
+            </div>
+
+            <div class="form-group">
+                <label for="maturityRating">Maturity Rating:</label>
+                <select id="maturityRating" name="maturityRating">
+                    <option value="TV-G">TV-G</option>
+                    <option value="TV-PG">TV-PG</option>
+                    <option value="TV-14" selected>TV-14</option>
+                    <option value="TV-MA">TV-MA</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn" id="saveCampaign">Save Campaign</button>
+            <p id="saveStatus" class="save-status"></p>
+        </form>
+    </main>
+
+    <div id="newUserModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Welcome!</h2>
+            <p>It looks like you don't have any campaigns loaded.</p>
+            <div class="modal-actions">
+                <button id="createNewCampaignBtn" class="btn">Create New Campaign</button>
+                <button id="importCampaignBtn" class="btn btn-secondary">Import from File</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 TTRPG Suite. All rights reserved. This code is open source.</p>
+    </footer>
+
+    <script src="js/index.js"></script>
+</body>
+</html>

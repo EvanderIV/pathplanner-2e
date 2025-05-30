@@ -1,0 +1,951 @@
+body {
+    font-family: 'Lato', sans-serif;
+    margin: 0;
+    background-color: #f4f0e8; /* Light parchment paper */
+    color: #4a3b31; /* Darker brown text */
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Rustic Scroll/Parchment Background Idea */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0.6;
+    /* Uncomment and replace with your image path if you have one */
+    /* background-image: url('img/parchment-texture.jpg'); */
+    background-image:
+        linear-gradient(to bottom right, rgba(239, 220, 187, 0.1) 25%, transparent 25%, transparent 75%, rgba(239, 220, 187, 0.1) 75%, rgba(239, 220, 187, 0.1)),
+        linear-gradient(to bottom right, rgba(210, 180, 140, 0.05) 25%, transparent 25%, transparent 75%, rgba(210, 180, 140, 0.05) 75%, rgba(210, 180, 140, 0.05));
+    background-size: 20px 20px;
+    background-position: 0 0, 10px 10px;
+    background-color: #f5e8c7; /* Base parchment */
+}
+
+
+.top-bar {
+    background-color: #5c4033; /* Dark wood brown */
+    color: #f5e8c7; /* Parchment text */
+    padding: 0.8rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    border-bottom: 3px solid #8a5a2c; /* Slightly lighter wood accent */
+}
+
+.top-bar .logo {
+    font-family: 'Merriweather', serif;
+    font-size: 1.8em;
+    font-weight: 700;
+}
+
+.top-bar nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+.top-bar nav ul li {
+    margin-left: 20px;
+}
+
+.top-bar nav ul li a {
+    color: #f5e8c7;
+    text-decoration: none;
+    font-size: 1em;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.top-bar nav ul li a:hover {
+    background-color: #8a5a2c; /* Lighter wood hover */
+    color: #fff;
+}
+
+.top-bar nav ul li a.active {
+    font-weight: bold;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+    color: #f0e68c; /* Khaki - slight highlight for active */
+}
+
+.container {
+    width: 80%;
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: rgba(245, 232, 199, 0.85); /* Semi-transparent parchment content area */
+    border: 1px solid #d2b48c; /* Tan border */
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    flex-grow: 1;
+}
+
+h1 {
+    font-family: 'Merriweather', serif;
+    color: #5c4033; /* Dark wood brown */
+    text-align: center;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #8a5a2c;
+    padding-bottom: 0.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-family: 'Merriweather', serif;
+    font-size: 1.1em;
+    margin-bottom: 0.5rem;
+    color: #5c4033;
+}
+
+input[type="text"],
+textarea,
+select {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #b08d57; /* Rustic gold/brown border */
+    border-radius: 4px;
+    background-color: #fffaf0; /* Creamy white */
+    font-family: 'Lato', sans-serif;
+    font-size: 1em;
+    color: #3a2410;
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input[type="text"]:focus,
+textarea:focus,
+select:focus {
+    border-color: #8a5a2c; /* Darker focus border */
+    box-shadow: 0 0 5px rgba(138, 90, 44, 0.3);
+    outline: none;
+}
+
+textarea {
+    resize: vertical;
+}
+
+.btn {
+    background-color: #6b4f41; /* Muted brown button */
+    color: #f5e8c7;
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    font-family: 'Merriweather', serif;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    border-bottom: 2px solid #4a3b31;
+}
+
+.btn:hover {
+    background-color: #8a5a2c; /* Lighter brown on hover */
+    transform: translateY(-2px);
+}
+
+.btn:active {
+    background-color: #4a3b31;
+    transform: translateY(0);
+}
+
+.btn-secondary {
+    background-color: #a0a0a0; /* Grey for secondary action */
+    color: #333;
+    border-bottom-color: #707070;
+}
+.btn-secondary:hover {
+    background-color: #b0b0b0;
+}
+.btn-secondary:active {
+    background-color: #808080;
+}
+
+
+.save-status {
+    margin-top: 1rem;
+    font-style: italic;
+    color: #38761d; /* Muted green for success */
+    text-align: center;
+}
+
+/* Modal Styles */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.6); /* Darker overlay */
+}
+
+.modal-content {
+    background-color: #f5e8c7; /* Parchment */
+    margin: 15% auto;
+    padding: 30px;
+    border: 2px solid #8a5a2c; /* Wood-like border */
+    border-radius: 8px;
+    width: 80%;
+    max-width: 500px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    text-align: center;
+    font-family: 'Merriweather', serif;
+    color: #5c4033;
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    color: #5c4033;
+}
+
+.close-button {
+    color: #777;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: #3a2410; /* Dark brown */
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-around;
+}
+
+footer {
+    background-color: #3e2e24; /* Darkest brown for footer */
+    color: #c5b8a5; /* Light tan text */
+    text-align: center;
+    padding: 1rem 0;
+    font-size: 0.9em;
+    margin-top: auto; /* Pushes footer to the bottom */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .top-bar {
+        flex-direction: column;
+        padding: 1rem;
+    }
+    .top-bar nav ul {
+        flex-direction: column;
+        align-items: center;
+        margin-top: 1rem;
+    }
+    .top-bar nav ul li {
+        margin: 0.5rem 0;
+    }
+    .container {
+        width: 95%;
+        margin: 1rem auto;
+        padding: 1.5rem;
+    }
+    .modal-content {
+        width: 90%;
+        margin: 20% auto;
+    }
+    .modal-actions {
+        flex-direction: column;
+    }
+    .modal-actions .btn {
+        margin-bottom: 10px;
+    }
+}
+
+
+/* Party Management Page Styles - Compact Adjustments */
+/* Expansion Fix: Refined transition for details */
+.party-member-details {
+    padding-left: 15px;  /* Horizontal padding always present */
+    padding-right: 15px;
+    padding-top: 0;      /* Vertical padding initially 0 */
+    padding-bottom: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease-out, padding-top 0.35s ease-out, padding-bottom 0.35s ease-out; /* Smooth transition for height and vertical padding */
+    
+    /* Compact UI adjustments from previous step */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 10px;
+}
+
+.party-member-card.expanded .party-member-details {
+    max-height: 1200px; /* Increased max-height to ensure all content fits */
+    padding: 10px 15px; /* Ensure padding is applied on expand */
+}
+
+.party-member-details .form-group {
+    margin-bottom: 0;
+}
+
+.party-member-details label {
+    font-size: 0.85em; /* Smaller label font size */
+    color: #6b4f41;
+    margin-bottom: 3px; /* Less space below label */
+    display: block;
+}
+
+/* Targeting inputs specifically within party member details for compactness */
+.party-member-details input[type="text"],
+.party-member-details input[type="number"],
+.party-member-details select,
+.party-member-details textarea {
+    padding: 0.5rem 0.6rem; /* Reduced padding inside inputs */
+    font-size: 0.9em; /* Smaller font size in inputs */
+    /* width: 100%; already handled by general input styles, but good to keep in mind */
+}
+
+.party-member-details textarea {
+    min-height: 50px; /* Smaller default height for textarea */
+}
+
+/* Styles for the inline action buttons within the details section */
+.party-member-inline-actions {
+    display: flex;
+    justify-content: flex-end; /* Align buttons to the right */
+    align-items: center;
+    gap: 10px; /* Space between buttons */
+    margin-top: 10px; /* A little space above the buttons */
+    grid-column: 1 / -1; /* Make this div span full width */
+}
+
+.party-member-inline-actions .btn {
+    padding: 0.4rem 0.8rem; /* Smaller buttons */
+    font-size: 0.85em;
+}
+
+/* Remove the old party-member-actions specific styling if it's no longer used elsewhere */
+/* .party-member-actions { (delete or comment out if this class is now fully removed from HTML)
+    padding: 10px 15px;
+    text-align: right;
+    border-top: 1px solid #e0cba8;
+} */
+
+.btn-delete-member { /* Keep or adjust specific delete button styling */
+    background-color: #a0522d;
+    color: white;
+    /* margin-left: 10px; Removed as gap is used now */
+}
+.btn-delete-member:hover {
+    background-color: #80381a;
+}
+
+
+
+.party-member-card {
+    /* UI Isolation: Lighter background and distinct border */
+    background-color: #fdfaf3; /* A lighter, slightly creamy off-white, distinct from container */
+    border: 1px solid #c8a064; /* A clear, darker tan border */
+    /* border-left: 5px solid #8a5a2c; /* This was from home page list, remove if not desired here */
+    border-radius: 6px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.party-member-header {
+    /* Keep header styling, maybe slightly adjust if needed due to new card background */
+    background-color: rgba(239, 220, 187, 0.6); /* Slightly adjusted for contrast if needed */
+    padding: 10px 15px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e0cba8; /* Lighter border for header if card border is strong */
+    border-top-left-radius: 5px;     /* Match card's border-radius */
+    border-top-right-radius: 5px;
+}
+
+.party-member-header h3 {
+    margin: 0;
+    font-family: 'Merriweather', serif;
+    color: #5c4033;
+}
+
+.party-member-header .expand-icon {
+    font-weight: bold;
+    transition: transform 0.3s ease;
+}
+
+.party-member-card.expanded .party-member-header .expand-icon {
+    transform: rotate(90deg);
+}
+
+
+
+.party-member-card.expanded .party-member-details {
+    max-height: 1500px; /* Increased significantly to ensure content fits. Adjust if necessary. */
+    padding-top: 10px;    /* Apply vertical padding when expanded */
+    padding-bottom: 15px; /* Slightly more padding at the bottom when expanded for button spacing */
+}
+
+/* Rest of the compact UI styles for labels, inputs etc. remain the same */
+.party-member-details .form-group {
+    margin-bottom: 0;
+}
+
+.party-member-details label {
+    font-size: 0.85em;
+    color: #6b4f41;
+    margin-bottom: 3px;
+    display: block;
+}
+
+.party-member-details input[type="text"],
+.party-member-details input[type="number"],
+.party-member-details select,
+.party-member-details textarea {
+    padding: 0.5rem 0.6rem;
+    font-size: 0.9em;
+}
+
+.party-member-details textarea {
+    min-height: 50px;
+}
+
+.party-member-inline-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    grid-column: 1 / -1;
+}
+
+.party-member-inline-actions .btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85em;
+}
+
+
+
+
+.btn-danger {
+    background-color: #c0392b; /* A rustic red */
+    color: #f5e8c7; /* Light text for contrast */
+    border-bottom-color: #962d22;
+}
+.btn-danger:hover {
+    background-color: #a93226;
+}
+.btn-danger:active {
+    background-color: #922b21;
+}
+
+
+
+/* Styles for Creature Generator Page */
+.creature-form-layout {
+    display: flex;
+    gap: 20px;
+}
+
+#creatureForm {
+    flex: 3; /* Form takes more space */
+}
+
+#suggestionsPanel {
+    flex: 1; /* Suggestions panel takes less space */
+    background-color: rgba(239, 220, 187, 0.6); /* Slightly different background */
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #d2b48c;
+    
+    /* --- Sticky Positioning --- */
+    position: sticky;
+    top: 80px; /* Adjust this value based on your top-bar's height + desired margin */
+    /* --- End Sticky Positioning --- */
+    
+    /* height: fit-content; */ /* May not be needed with max-height, or can cause issues with sticky if content is very short. Test this. */
+    max-height: calc(100vh - 100px); /* Adjust max-height to ensure it doesn't overlap footer if sticky */
+                                   /* (100px = 80px top offset + 20px bottom margin/padding) */
+    overflow-y: auto;
+}
+
+#suggestionsPanel h2 {
+    margin-top: 0;
+    font-family: 'Merriweather', serif;
+    color: #5c4033;
+    font-size: 1.3em;
+    border-bottom: 1px solid #8a5a2c;
+    padding-bottom: 5px;
+}
+
+#suggestionsContent ul {
+    list-style: none;
+    padding-left: 0;
+    font-size: 0.9em;
+}
+#suggestionsContent li {
+    margin-bottom: 5px;
+}
+#suggestionsContent li strong {
+    color: #5c4033;
+}
+
+#creatureForm fieldset {
+    border: 1px solid #d2b48c;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 20px;
+    background-color: rgba(245, 232, 199, 0.3);
+}
+
+#creatureForm legend {
+    font-family: 'Merriweather', serif;
+    font-weight: bold;
+    color: #5c4033;
+    padding: 0 10px;
+    font-size: 1.2em;
+}
+
+.form-group { /* Reusing existing, ensure it works well */
+    margin-bottom: 1rem; /* Ensure spacing */
+}
+
+.custom-stat-input {
+    margin-left: 10px;
+    width: auto; /* Allow it to be smaller */
+    max-width: 150px;
+}
+
+.stat-value-display {
+    margin-left: 10px;
+    font-weight: bold;
+    color: #3a2410;
+}
+
+.btn-small { /* For random name button */
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8em;
+    margin-left: 10px;
+}
+
+#magicalStatsContainer {
+    border-left: 3px solid #8a5a2c;
+    padding-left: 15px;
+    margin-top: 10px;
+    margin-left: 5px; /* Indent magical stats slightly */
+}
+
+/* Responsive adjustments if needed */
+@media (max-width: 900px) { /* Existing 900px media query from creature generator, will add new rules to it or create new one if context implies it*/
+    .creature-form-layout {
+        flex-direction: column;
+    }
+    #creatureForm, #suggestionsPanel {
+        flex: none;
+    }
+}
+
+
+/* --- Styles for Homebrew Catalog Page --- */
+
+.catalog-controls-bar {
+    display: flex;
+    justify-content: flex-start; 
+    align-items: center; /* Vertically align items in the middle if they have different heights */
+    flex-wrap: wrap; 
+    gap: 15px; 
+    margin-bottom: 20px; 
+    padding-bottom: 10px; /* Reduced padding below the controls bar */
+    border-bottom: 1px solid #d2b48c;
+}
+
+/* Custom Dropdown for Add Asset Button */
+.add-asset-container {
+    position: relative; /* For positioning the dropdown */
+    display: inline-block; /* Allow other elements next to it if needed */
+    margin-bottom: 0; /* Remove default margin if any, rely on gap */
+}
+
+.custom-dropdown-menu {
+    display: none; /* Hidden by default */
+    position: absolute;
+    top: 100%; /* Position below the button */
+    left: 0;
+    background-color: #fdfaf3; /* Light background like cards */
+    border: 1px solid #c8a064;
+    border-radius: 0 0 6px 6px; /* Rounded bottom corners */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    z-index: 100; /* Ensure it's above other content */
+    min-width: 200px; /* Or width of the button */
+}
+
+.custom-dropdown-menu a {
+    display: block;
+    padding: 10px 15px;
+    color: #5c4033;
+    text-decoration: none;
+    border-bottom: 1px solid #e0cba8; /* Separator */
+}
+.custom-dropdown-menu a:last-child {
+    border-bottom: none;
+}
+.custom-dropdown-menu a:hover {
+    background-color: rgba(239, 220, 187, 0.6); /* Hover effect */
+}
+
+.sort-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Reduced gap */
+}
+.sort-controls label {
+    font-weight: bold;
+    color: #5c4033;
+    font-size: 0.9em; /* Slightly smaller label */
+    margin-bottom: 0; /* Remove margin if any */
+    width: 5.8em;
+}
+.sort-controls select {
+    padding: 0.3rem 0.5rem; /* Reduced padding */
+    font-size: 0.9em; /* Slightly smaller font in select */
+    border-radius: 4px;
+    border: 1px solid #b08d57;
+    background-color: #fffaf0;
+}
+.sort-controls .btn-small { /* For reverse button */
+    padding: 0.3rem 0.5rem; /* Make reverse button padding consistent with select */
+    font-size: 0.9em; /* Ensure font size matches select for alignment */
+    line-height: 1.2; /* Adjust line height for better vertical alignment if needed */
+}
+
+/* Styles for the filter panel in its top position */
+.filter-panel-top {
+    background-color: transparent; /* Make less visually heavy, or very light */
+    padding: 5px 10px; /* Reduced padding */
+    border-radius: 6px;
+    border: 1px solid #d2b48c; /* Keep border for grouping or make it lighter */
+    /* border: 1px solid #e0cba8; */ /* Example of a lighter border */
+}
+
+.filter-panel-top h2 {
+    margin-top: 0;
+    margin-bottom: 5px; /* Reduced margin */
+    font-family: 'Merriweather', serif;
+    color: #5c4033;
+    font-size: 0.95em; /* Smaller title */
+    border-bottom: none; /* Remove border for compactness, or make it very light */
+    padding-bottom: 0;
+    display: inline-block; /* Allow options to flow next to it if space allows */
+    margin-right: 10px; /* Space between title and first option */
+}
+
+.filter-panel-top .filter-options-container {
+    display: flex; /* Arrange filter groups horizontally */
+    gap: 10px;     /* Reduced gap */
+    flex-wrap: wrap;
+    align-items: center; /* Align checkboxes and labels */
+}
+
+.filter-panel-top .filter-group {
+    margin-bottom: 0; 
+    display: flex; /* Align checkbox and label nicely */
+    align-items: center;
+}
+.filter-panel-top .filter-group label {
+    margin-left: 3px; /* Reduced margin */
+    color: #4a3b31;
+    font-size: 0.85em; /* Smaller label text */
+}
+.filter-panel-top .filter-group input[type="checkbox"] {
+    vertical-align: middle;
+    margin: 0; /* Remove default checkbox margins */
+    transform: scale(0.9); /* Slightly smaller checkbox */
+}
+
+
+.homebrew-assets-area {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    align-items: start; 
+}
+
+.homebrew-asset-card {
+    background-color: #fdfaf3; 
+    border: 1px solid #eDeCe6; 
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.homebrew-asset-header {
+    background-color: #D1C0A8; 
+    padding: 10px 15px;
+    border-bottom: 1px solid #b0a08c; 
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.homebrew-asset-header h3 {
+    margin: 0;
+    font-family: 'Merriweather', serif;
+    color: #4a3b31; 
+    font-size: 1.2em;
+}
+
+.homebrew-asset-header .asset-type-badge {
+    font-size: 0.8em;
+    padding: 3px 8px;
+    border-radius: 10px;
+    background-color: #7a6252; 
+    color: #fdfaf3; 
+}
+
+.homebrew-asset-content {
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 0;
+    padding-bottom: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease-out, 
+                padding-top 0.35s ease-out, 
+                padding-bottom 0.35s ease-out;
+}
+
+.homebrew-asset-card.expanded .homebrew-asset-content {
+    max-height: 2000px; 
+    padding-top: 10px;
+    padding-bottom: 15px;
+}
+
+.creature-full-details p {
+    margin: 6px 0; 
+    line-height: 1.6;
+}
+.creature-full-details strong {
+    color: #5c4033;
+    display: inline-block;
+    min-width: 130px; 
+}
+
+.asset-inline-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 15px;
+    padding-top: 10px;
+}
+
+.homebrew-asset-card {
+    background-color: #fdfaf3;
+    border: 1px solid #c8a064;
+    border-radius: 6px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.12); 
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px; 
+}
+
+.homebrew-asset-header .expand-icon {
+    font-weight: bold;
+    font-size: 1.2em;
+    transition: transform 0.3s ease; 
+    margin-left: 10px;
+}
+
+.homebrew-asset-card.expanded .homebrew-asset-header .expand-icon {
+    transform: rotate(90deg);
+}
+
+.homebrew-asset-content { 
+    padding-left: 15px;  
+    padding-right: 15px;
+    padding-top: 0;      
+    padding-bottom: 0;
+    max-height: 0;       
+    overflow: hidden;
+    transition: max-height 0.35s ease-out, 
+                padding-top 0.35s ease-out, 
+                padding-bottom 0.35s ease-out;
+}
+
+.homebrew-asset-card.expanded .homebrew-asset-content {
+    max-height: 2000px; 
+    padding-top: 10px;    
+    padding-bottom: 15px; 
+}
+
+.creature-full-details {
+    font-size: 0.9em;
+}
+.creature-full-details p {
+    margin: 4px 0;
+    line-height: 1.5;
+}
+.creature-full-details strong {
+    color: #5c4033;
+    display: inline-block;
+    min-width: 120px; 
+}
+.creature-full-details .notes-section {
+    margin-top: 10px;
+    white-space: pre-wrap; 
+    background-color: rgba(0,0,0,0.02);
+    padding: 5px;
+    border-radius: 3px;
+}
+
+.catalog-main-layout {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start; 
+}
+
+.homebrew-assets-columns { 
+    flex: 3; 
+    display: flex; 
+    gap: 20px; 
+}
+
+.asset-column { 
+    flex: 1; 
+    display: flex;
+    flex-direction: column; 
+    gap: 20px; 
+}
+
+
+.filter-panel {
+    flex: 1;
+    background-color: rgba(239, 220, 187, 0.4);
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #d2b48c;
+    height: fit-content; 
+    position: sticky; 
+    top: 80px;      
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+}
+
+.filter-panel h2 {
+    margin-top: 0;
+    font-family: 'Merriweather', serif;
+    color: #5c4033;
+    font-size: 1.3em;
+    border-bottom: 1px solid #8a5a2c;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+.filter-group {
+    margin-bottom: 8px;
+}
+.filter-group label {
+    margin-left: 5px;
+    color: #4a3b31;
+}
+.filter-group input[type="checkbox"] {
+    vertical-align: middle;
+}
+
+
+/* Responsive adjustments for controls and layout */
+@media (max-width: 900px) {
+    .creature-form-layout { /* This was existing for 900px */
+        flex-direction: column;
+    }
+    #creatureForm, #suggestionsPanel { /* This was existing for 900px */
+        flex: none;
+    }
+
+    .catalog-controls-bar {
+        flex-direction: column;
+        align-items: stretch; 
+    }
+    .filter-panel-top {
+        margin-top: 10px; /* Add some space when it stacks */
+    }
+    .filter-panel-top h2 {
+        display: block; /* Stack title above options on smaller screens */
+        margin-bottom: 8px;
+    }
+    .filter-panel-top .filter-options-container {
+        flex-direction: row; /* Keep options in a row to wrap, or column if preferred */
+        align-items: flex-start; /* Align to start if they wrap */
+    }
+}
+
+@media (max-width: 768px) {
+    .top-bar {
+        flex-direction: column;
+        padding: 1rem;
+    }
+    .top-bar nav ul {
+        flex-direction: column;
+        align-items: center;
+        margin-top: 1rem;
+    }
+    .top-bar nav ul li {
+        margin: 0.5rem 0;
+    }
+    .container {
+        width: 95%;
+        margin: 1rem auto;
+        padding: 1.5rem;
+    }
+    .modal-content {
+        width: 90%;
+        margin: 20% auto;
+    }
+    .modal-actions {
+        flex-direction: column;
+    }
+    .modal-actions .btn {
+        margin-bottom: 10px;
+    }
+
+    /* Catalog specific adjustments for 768px */
+    .catalog-controls-bar {
+        flex-direction: column;
+        align-items: flex-start; /* This will override the 900px 'stretch' for smaller screens */
+    }
+    .catalog-main-layout {
+        flex-direction: column;
+    }
+    .filter-panel {
+        width: 100%;
+        margin-top: 20px;
+        position: static; /* Disable sticky on small screens if it causes issues */
+        max-height: none;
+    }
+    .homebrew-assets-columns {
+        flex-direction: column; /* Stack columns vertically on very small screens, or just let content wrap */
+    }
+}
