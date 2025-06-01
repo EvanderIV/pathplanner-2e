@@ -3,17 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creature Generator - TTRPG Suite</title>
+    <title>Creature Generator - Pathplanner 2e</title>
+    <link rel="icon" href="/games/img/pathplanner_icon.png">
     <link rel="stylesheet" href="../css/index.css">
+    <meta name="darkreader-lock">
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <header class="top-bar">
-        <div class="logo">TTRPG Suite</div>
+        <div class="logo">Pathplanner 2e</div>
         <nav>
             <ul>
                 <li><a href="../">Home</a></li>
                 <li><a href="../campaign">Campaign Details</a></li>
+                <li><a href="../sessions">Sessions</a></li>
                 <li><a href="../party">Party Management</a></li>
                 <li><a href="../homebrew">Homebrew Catalog</a></li>
                 <li><a href="" class="active">Creature Generator</a></li>
@@ -23,154 +26,186 @@
 
     <main class="container">
         <h1>Creature Generator</h1>
-        <div class="creature-form-layout">
-            <form id="creatureForm">
-                <fieldset>
-                    <legend>Basic Information</legend>
-                    <div class="form-group">
-                        <label for="creatureName">Creature Name:</label>
-                        <input type="text" id="creatureName" name="creatureName">
-                        <button type="button" id="randomNameBtn" class="btn btn-small">Random</button>
-                    </div>
-                    <div class="form-group">
-                        <label for="creatureLevel">Creature Level (-1 to 24):</label>
-                        <input type="number" id="creatureLevel" name="creatureLevel" min="-1" max="24" value="1">
-                    </div>
-                </fieldset>
-
-                <fieldset>
-                    <legend>Core Combat Stats</legend>
-                    <div class="form-group">
-                        <label for="hitPoints_tier">Hit Points Tier:</label>
-                        <select id="hitPoints_tier" name="hitPoints_tier" data-stat="hitPoints">
-                            </select>
-                        <span class="stat-value-display" id="hitPoints_value_display"></span>
-                        <input type="number" id="hitPoints_custom" class="custom-stat-input" style="display:none;" placeholder="Custom HP">
-                    </div>
-                    <div class="form-group">
-                        <label for="armorClass_tier">Armor Class Tier:</label>
-                        <select id="armorClass_tier" name="armorClass_tier" data-stat="armorClass">
-                            </select>
-                        <span class="stat-value-display" id="armorClass_value_display"></span>
-                        <input type="number" id="armorClass_custom" class="custom-stat-input" style="display:none;" placeholder="Custom AC">
-                    </div>
-                     <div class="form-group">
-                        <label for="speed_tier">Speed Tier:</label>
-                        <select id="speed_tier" name="speed_tier" data-stat="speed">
-                            </select>
-                        <span class="stat-value-display" id="speed_value_display"></span>
-                        <input type="number" id="speed_custom" class="custom-stat-input" style="display:none;" placeholder="Custom Speed">
-                    </div>
-                </fieldset>
-
-                <fieldset>
-                    <legend>Saves & Skills</legend>
-                    <div class="form-group">
-                        <label for="savingThrows_tier">Saving Throws Tier (General):</label>
-                        <select id="savingThrows_tier" name="savingThrows_tier" data-stat="savingThrows">
-                            </select>
-                        <span class="stat-value-display" id="savingThrows_value_display"></span>
-                        <input type="number" id="savingThrows_custom" class="custom-stat-input" style="display:none;" placeholder="Custom Save Bonus">
-                    </div>
-                    <div class="form-group">
-                        <label for="perception_tier">Perception Tier:</label>
-                        <select id="perception_tier" name="perception_tier" data-stat="perception">
-                            </select>
-                        <span class="stat-value-display" id="perception_value_display"></span>
-                        <input type="number" id="perception_custom" class="custom-stat-input" style="display:none;" placeholder="Custom Perception">
-                    </div>
-                    <div class="form-group">
-                        <label for="skills_tier">Skills Tier (General):</label>
-                        <select id="skills_tier" name="skills_tier" data-stat="skills">
-                            </select>
-                        <span class="stat-value-display" id="skills_value_display"></span>
-                        <input type="number" id="skills_custom" class="custom-stat-input" style="display:none;" placeholder="Custom Skill Bonus">
-                    </div>
-                    <div class="form-group">
-                        <label for="attrMod_tier">Attribute Modifiers Tier (Primary):</label>
-                        <select id="attrMod_tier" name="attrMod_tier" data-stat="attrMod">
-                            </select>
-                        <span class="stat-value-display" id="attrMod_value_display"></span>
-                        <input type="number" id="attrMod_custom" class="custom-stat-input" style="display:none;" placeholder="Custom Attr. Mod">
-                    </div>
-                </fieldset>
-                
-                <fieldset>
-                    <legend>Offense</legend>
-                     <div class="form-group">
-                        <label for="strikeAtkBonus_tier">Strike Attack Bonus Tier:</label>
-                        <select id="strikeAtkBonus_tier" name="strikeAtkBonus_tier" data-stat="strikeAtkBonus">
-                            </select>
-                        <span class="stat-value-display" id="strikeAtkBonus_value_display"></span>
-                        <input type="number" id="strikeAtkBonus_custom" class="custom-stat-input" style="display:none;" placeholder="Custom Atk Bonus">
-                    </div>
-                    <div class="form-group">
-                        <label for="strikeDmg_tier">Strike Damage Tier:</label>
-                        <select id="strikeDmg_tier" name="strikeDmg_tier" data-stat="strikeDmg">
-                            </select>
-                        <span class="stat-value-display" id="strikeDmg_value_display"></span>
-                        <input type="text" id="strikeDmg_custom" class="custom-stat-input" style="display:none;" placeholder="Custom Dmg (e.g., 2d6+4 (11))">
-                    </div>
-                </fieldset>
-
-                <fieldset>
-                    <legend>Magical Abilities</legend>
-                    <div class="form-group">
-                        <label for="isMagical">Is this creature magical?</label>
-                        <select id="isMagical" name="isMagical">
-                            <option value="no" selected>No</option>
-                            <option value="yes">Yes</option>
-                        </select>
-                    </div>
-                    <div id="magicalStatsContainer" style="display:none;">
+        <div id="creatureGeneratorPageContent">
+            <div class="creature-form-layout">
+                <form id="creatureForm">
+                    <fieldset>
+                        <legend>Basic Information</legend>
                         <div class="form-group">
-                            <label for="spellAtkMod_tier">Spell Attack Modifier Tier:</label>
-                            <select id="spellAtkMod_tier" name="spellAtkMod_tier" data-stat="spellAtkMod">
-                                </select>
-                            <span class="stat-value-display" id="spellAtkMod_value_display"></span>
-                            <input type="number" id="spellAtkMod_custom" class="custom-stat-input" style="display:none;" placeholder="Custom Spell Atk">
+                            <label for="creatureName">Creature Name:</label>
+                            <input type="text" id="creatureName" name="creatureName">
+                            <button type="button" id="randomNameBtn" class="btn btn-small">Random</button>
                         </div>
                         <div class="form-group">
-                            <label for="spellDC_tier">Spell DC Tier:</label>
-                            <select id="spellDC_tier" name="spellDC_tier" data-stat="spellDC">
+                            <label for="creatureLevel">Creature Level (-1 to 24):</label>
+                            <input type="number" id="creatureLevel" name="creatureLevel" min="-1" max="24" value="1">
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>Core Combat Stats</legend>
+                        <div class="form-group">
+                            <label for="hitPoints_tier">Hit Points Tier:</label>
+                            <select id="hitPoints_tier" name="hitPoints_tier" data-stat="hitPoints">
                                 </select>
-                            <span class="stat-value-display" id="spellDC_value_display"></span>
-                            <input type="number" id="spellDC_custom" class="custom-stat-input" style="display:none;" placeholder="Custom Spell DC">
+                            <span class="stat-value-display" id="hitPoints_value_display"></span>
+                            <input type="number" id="hitPoints_custom" class="custom-stat-input" style="display:none;" placeholder="Custom HP">
                         </div>
                         <div class="form-group">
-                            <label for="areaDmg_tier">Area Damage Tier:</label>
-                            <select id="areaDmg_tier" name="areaDmg_tier" data-stat="areaDmg">
+                            <label for="armorClass_tier">Armor Class Tier:</label>
+                            <select id="armorClass_tier" name="armorClass_tier" data-stat="armorClass">
                                 </select>
-                            <span class="stat-value-display" id="areaDmg_value_display"></span>
-                            <input type="text" id="areaDmg_custom" class="custom-stat-input" style="display:none;" placeholder="Custom Area Dmg (e.g., 3d6 (11))">
+                            <span class="stat-value-display" id="armorClass_value_display"></span>
+                            <input type="number" id="armorClass_custom" class="custom-stat-input" style="display:none;" placeholder="Custom AC">
+                        </div>
+                         <div class="form-group">
+                            <label for="speed_tier">Speed Tier:</label>
+                            <select id="speed_tier" name="speed_tier" data-stat="speed">
+                                </select>
+                            <span class="stat-value-display" id="speed_value_display"></span>
+                            <input type="number" id="speed_custom" class="custom-stat-input" style="display:none;" placeholder="Custom Speed">
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>Saves & Skills</legend>
+                        <div class="form-group">
+                            <label for="savingThrows_tier">Saving Throws Tier (General):</label>
+                            <select id="savingThrows_tier" name="savingThrows_tier" data-stat="savingThrows">
+                                </select>
+                            <span class="stat-value-display" id="savingThrows_value_display"></span>
+                            <input type="number" id="savingThrows_custom" class="custom-stat-input" style="display:none;" placeholder="Custom Save Bonus">
+                        </div>
+                        <div class="form-group">
+                            <label for="perception_tier">Perception Tier:</label>
+                            <select id="perception_tier" name="perception_tier" data-stat="perception">
+                                </select>
+                            <span class="stat-value-display" id="perception_value_display"></span>
+                            <input type="number" id="perception_custom" class="custom-stat-input" style="display:none;" placeholder="Custom Perception">
+                        </div>
+                        <div class="form-group">
+                            <label for="skills_tier">Skills Tier (General):</label>
+                            <select id="skills_tier" name="skills_tier" data-stat="skills">
+                                </select>
+                            <span class="stat-value-display" id="skills_value_display"></span>
+                            <input type="number" id="skills_custom" class="custom-stat-input" style="display:none;" placeholder="Custom Skill Bonus">
+                        </div>
+                        <div class="form-group">
+                            <label for="attrMod_tier">Attribute Modifiers Tier (Primary):</label>
+                            <select id="attrMod_tier" name="attrMod_tier" data-stat="attrMod">
+                                </select>
+                            <span class="stat-value-display" id="attrMod_value_display"></span>
+                            <input type="number" id="attrMod_custom" class="custom-stat-input" style="display:none;" placeholder="Custom Attr. Mod">
+                        </div>
+                    </fieldset>
+                    
+                    <fieldset>
+                        <legend>Offense</legend>
+                         <div class="form-group">
+                            <label for="strikeAtkBonus_tier">Strike Attack Bonus Tier:</label>
+                            <select id="strikeAtkBonus_tier" name="strikeAtkBonus_tier" data-stat="strikeAtkBonus">
+                                </select>
+                            <span class="stat-value-display" id="strikeAtkBonus_value_display"></span>
+                            <input type="number" id="strikeAtkBonus_custom" class="custom-stat-input" style="display:none;" placeholder="Custom Atk Bonus">
+                        </div>
+                        <div class="form-group">
+                            <label for="strikeDmg_tier">Strike Damage Tier:</label>
+                            <select id="strikeDmg_tier" name="strikeDmg_tier" data-stat="strikeDmg">
+                                </select>
+                            <span class="stat-value-display" id="strikeDmg_value_display"></span>
+                            <input type="text" id="strikeDmg_custom" class="custom-stat-input" style="display:none;" placeholder="Custom Dmg (e.g., 2d6+4)">
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>Magical Abilities</legend>
+                        <div class="form-group">
+                            <label for="isMagical">Is this creature magical?</label>
+                            <select id="isMagical" name="isMagical">
+                                <option value="no" selected>No</option>
+                                <option value="yes">Yes</option>
+                            </select>
+                        </div>
+                        <div id="magicalStatsContainer" style="display:none;">
+                            <div class="form-group">
+                                <label for="spellAtkMod_tier">Spell Attack Modifier Tier:</label>
+                                <select id="spellAtkMod_tier" name="spellAtkMod_tier" data-stat="spellAtkMod">
+                                    </select>
+                                <span class="stat-value-display" id="spellAtkMod_value_display"></span>
+                                <input type="number" id="spellAtkMod_custom" class="custom-stat-input" style="display:none;" placeholder="Custom Spell Atk">
+                            </div>
+                            <div class="form-group">
+                                <label for="spellDC_tier">Spell DC Tier:</label>
+                                <select id="spellDC_tier" name="spellDC_tier" data-stat="spellDC">
+                                    </select>
+                                <span class="stat-value-display" id="spellDC_value_display"></span>
+                                <input type="number" id="spellDC_custom" class="custom-stat-input" style="display:none;" placeholder="Custom Spell DC">
+                            </div>
+                            <div class="form-group">
+                                <label for="areaDmg_tier">Area Damage Tier:</label>
+                                <select id="areaDmg_tier" name="areaDmg_tier" data-stat="areaDmg">
+                                    </select>
+                                <span class="stat-value-display" id="areaDmg_value_display"></span>
+                                <input type="text" id="areaDmg_custom" class="custom-stat-input" style="display:none;" placeholder="Custom Area Dmg (e.g., 3d6)">
+                            </div>
+                        </div>
+                    </fieldset>
+                     <fieldset>
+                        <legend>Other</legend>
+                        <div class="form-group">
+                            <label for="resistAndWeak_tier">Resistances/Weaknesses Value Tier:</label>
+                             <select id="resistAndWeak_tier" name="resistAndWeak_tier" data-stat="resistAndWeak">
+                                </select>
+                            <span class="stat-value-display" id="resistAndWeak_value_display"></span>
+                            <input type="number" id="resistAndWeak_custom" class="custom-stat-input" style="display:none;" placeholder="Custom R/W Value">
+                        </div>
+                        <div class="form-group">
+                            <label for="creatureNotes">Notes (Abilities, Behavior, etc.):</label>
+                            <textarea id="creatureNotes" name="creatureNotes" rows="4"></textarea>
+                        </div>
+                    </fieldset>
+
+                    <div id="warningBox" style="display:none;">
+                        <h4><img src="../img/warning.png" alt="Warning" class="warning-icon"> Warnings:</h4>
+                        <ul id="warningList"></ul>
+                    </div>
+                    <div id="diagnosticsPanel">
+                        <div class="diagnostics-column diagnostics-graph-area">
+                            <svg id="diagnosticsHexagonSVG" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+                                <defs>
+                                    <polygon id="hexagonShape" points="50,5 93.3,27.5 93.3,72.5 50,95 6.7,72.5 6.7,27.5" />
+                                </defs>
+                                <use xlink:href="#hexagonShape" class="hexagon-background"/>
+                                <polygon id="statsTriangle" class="stats-triangle-shape" points="50,50 50,50 50,50"/>
+                                <text x="50" y="19" class="diag-label" text-anchor="middle">Spd</text>
+                                <text x="10" y="88" class="diag-label" text-anchor="middle">Atk</text>
+                                <text x="90" y="88" class="diag-label" text-anchor="middle">Def</text>
+                            </svg>
+                        </div>
+                        <div class="diagnostics-column diagnostics-info-area">
+                            <h4>Stat Profile:</h4>
+                            <p>Speed: <span id="diagSpeedActual">N/A</span><span> (norm: </span><span id="diagSpeedScore">N/A</span><span>)</span></p>
+                            <p>Offense Tier Avg: <span id="diagOffenseScore">N/A</span></p>
+                            <p>Vitality Tier Avg: <span id="diagVitalityScore">N/A</span></p>
+                            <h5>Normals close to 0.5 are ideal for balanced creatures.</h5>
+                            <p class="ttk-display" style="margin-bottom: 0;"><strong>Estimated Time to Kill:</strong> <span id="ttkDisplay">Calculating...</span></p>
+                            <a style="font-size: smaller; margin-top: 0;" href="guide#how-the-generator-works" target="_blank">How we calculate this &rarr;</a>
                         </div>
                     </div>
-                </fieldset>
-                 <fieldset>
-                    <legend>Other</legend>
-                    <div class="form-group">
-                        <label for="resistAndWeak_tier">Resistances/Weaknesses Value Tier:</label>
-                         <select id="resistAndWeak_tier" name="resistAndWeak_tier" data-stat="resistAndWeak">
-                            </select>
-                        <span class="stat-value-display" id="resistAndWeak_value_display"></span>
-                        <input type="number" id="resistAndWeak_custom" class="custom-stat-input" style="display:none;" placeholder="Custom R/W Value">
+                    <div class="form-actions">
+                        <button type="submit" id="saveCreatureBtn" class="btn btn-save-page">Save Creature</button>
+                        <button type="button" id="exportCreatureBtn" class="btn btn-secondary">Export as URL</button>
                     </div>
-                    <div class="form-group">
-                        <label for="creatureNotes">Notes (Abilities, Behavior, etc.):</label>
-                        <textarea id="creatureNotes" name="creatureNotes" rows="4"></textarea>
+                    <p id="saveStatusCreature" class="save-status"></p>
+                </form>
+
+                <aside id="suggestionsPanel">
+                    <h2>Stat Suggestions (Level <span id="currentLevelDisplay">1</span>)</h2>
+                    <div id="suggestionsContent">
+                        <p>Select a stat category or change the level to see suggestions here.</p>
                     </div>
-                </fieldset>
-
-                <button type="submit" id="saveCreatureBtn" class="btn btn-save-page">Save Creature</button>
-                <p id="saveStatusCreature" class="save-status"></p>
-            </form>
-
-            <aside id="suggestionsPanel">
-                <h2>Stat Suggestions (Level <span id="currentLevelDisplay">1</span>)</h2>
-                <div id="suggestionsContent">
-                    <p>Select a stat category or change the level to see suggestions here.</p>
-                </div>
-            </aside>
+                </aside>
+            </div>
         </div>
     </main>
 
@@ -199,7 +234,7 @@
     </div>
 
     <footer>
-        <p>&copy; 2025 TTRPG Suite. All rights reserved. This code is open source.</p>
+        <p>&copy; 2025 Pathplanner 2e. All rights reserved. This app is <a href="https://github.com/EvanderIV/pathplanner-2e" class="open-source-link" target="_blank">open source</a>.</p>
     </footer>
 
     <script src="js/index.js"></script>

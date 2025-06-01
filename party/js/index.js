@@ -1,3 +1,4 @@
+// index.js (for Party Management page)
 document.addEventListener('DOMContentLoaded', () => {
     const campaignNameDisplay = document.getElementById('campaignNameDisplay');
     const partyManagementContent = document.getElementById('partyManagementContent');
@@ -6,27 +7,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const savePartyChangesBtn = document.getElementById('savePartyChangesBtn');
     const saveStatusParty = document.getElementById('saveStatusParty');
 
-    // No Campaign Loaded Modal
-    const noCampaignModalParty = document.getElementById('newUserModal');
-    const closeModalPartyBtn = noCampaignModalParty.querySelector('.close-button');
-    const modalCreateNewCampaignBtnParty = document.getElementById('modalCreateNewCampaignBtnParty');
-    const modalImportCampaignBtnParty = document.getElementById('modalImportCampaignBtnParty');
+    // No Campaign Loaded Modal (Ensure IDs match your party management HTML)
+    const noCampaignModalParty = document.getElementById('newUserModal'); // From your HTML
+    const closeModalPartyBtn = noCampaignModalParty ? noCampaignModalParty.querySelector('.close-button') : null;
+    const modalCreateNewCampaignBtnParty = document.getElementById('createNewCampaignBtn'); // From your HTML
+    const modalImportCampaignBtnParty = document.getElementById('importCampaignBtn'); // From your HTML
 
-    // Advanced Details Modal
+    // Advanced Details Modal (Pathbuilder Import Modal)
     const advancedCharacterModal = document.getElementById('advancedCharacterModal');
-    const closeAdvancedModalBtn = advancedCharacterModal.querySelector('.close-advanced-modal-btn');
+    const closeAdvancedModalBtn = advancedCharacterModal ? advancedCharacterModal.querySelector('#closeAdvancedModalBtn') : null; // Ensure this ID is on the close button in HTML
     const advancedModalTitle = document.getElementById('advancedModalTitle');
-    const advancedModalBody = document.getElementById('advancedModalBody');
-    const saveAdvancedDetailsBtn = document.getElementById('saveAdvancedDetailsBtn');
-    let currentEditingMemberIdForAdvanced = null;
+    // Pathbuilder Import specific elements (ensure these are in your advancedCharacterModal HTML)
+    const pathbuilderIdInput = document.getElementById('pathbuilderIdInput');
+    const fetchPathbuilderDataBtn = document.getElementById('fetchPathbuilderDataBtn');
+    const pathbuilderJsonOutput = document.getElementById('pathbuilderJsonOutput');
+    
+    let currentEditingMemberIdForAdvanced = null; // To know which party member to associate the data with
 
     // Delete Confirmation Modal Elements
     const deleteConfirmModal = document.getElementById('deleteConfirmModal');
-    const closeDeleteConfirmModalBtn = document.getElementById('closeDeleteConfirmModalBtn');
+    const closeDeleteConfirmModalBtn = deleteConfirmModal ? document.getElementById('closeDeleteConfirmModalBtn') : null; // Ensure ID
     const deleteConfirmMessage = document.getElementById('deleteConfirmMessage');
     const confirmDeleteCharacterBtn = document.getElementById('confirmDeleteCharacterBtn');
     const cancelDeleteCharacterBtn = document.getElementById('cancelDeleteCharacterBtn');
-    let memberIdToDelete = null; // To store the ID of the member to be deleted
+    let memberIdToDelete = null; 
 
 
     const LAST_VIEWED_CAMPAIGN_KEY = 'ttrpgSuite_lastViewedCampaign';
@@ -58,15 +62,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function generateUniqueId() {
-        return Date.now().toString(36) + Math.random().toString(36).substring(2);
+        return Date.now().toString(36) + Math.random().toString(36).substring(2, 9); // Shortened random part
+    }
+
+    // --- Generic Modal Controls ---
+    function openModal(modalElement) {
+        if (modalElement) modalElement.style.display = 'block';
+    }
+    function closeModal(modalElement) {
+        if (modalElement) modalElement.style.display = 'none';
     }
 
     // --- "No Campaign" Modal Logic ---
     function openNoCampaignModal() {
-        if (noCampaignModalParty) noCampaignModalParty.style.display = 'block';
+        if (noCampaignModalParty) openModal(noCampaignModalParty);
     }
     function closeNoCampaignModal() {
-        if (noCampaignModalParty) noCampaignModalParty.style.display = 'none';
+        if (noCampaignModalParty) closeModal(noCampaignModalParty);
     }
 
     if (closeModalPartyBtn) closeModalPartyBtn.addEventListener('click', closeNoCampaignModal);
@@ -78,148 +90,198 @@ document.addEventListener('DOMContentLoaded', () => {
                 description: "My new adventure begins here...",
                 genre: "Fantasy",
                 maturityRating: "TV-14",
-                partyMembers: []
+                partyMembers: [],
+                sessions: [] // Ensure sessions array is also initialized
             };
             setCookie(CAMPAIGN_DATA_PREFIX + newCampaignName, JSON.stringify(dummyCampaignData), 365);
             setCookie(LAST_VIEWED_CAMPAIGN_KEY, newCampaignName, 365);
-            window.location.href = 'index.html'; // Redirect to campaign details
+            window.location.href = '../index.html'; // Redirect to main campaign details page
         });
     }
-    if (modalImportCampaignBtnParty) {
+    if (modalImportCampaignBtnParty) { // This button's HTML text is "Import from File"
         modalImportCampaignBtnParty.addEventListener('click', () => {
             alert('Import functionality is not yet implemented.');
             closeNoCampaignModal();
         });
     }
 
-    // --- Advanced Modal Logic ---
+    // --- Advanced Modal Logic (Pathbuilder Import) ---
     function openAdvancedModal(memberId) {
+        if (!currentCampaignFullData || !currentCampaignFullData.partyMembers) return;
         const member = currentCampaignFullData.partyMembers.find(m => m.id === memberId);
-        if (member) {
+        if (member && advancedCharacterModal) {
             currentEditingMemberIdForAdvanced = memberId;
-            advancedModalTitle.textContent = `Advanced Details for ${member.name || 'Unnamed Character'}`;
-            // Populate advancedModalBody with member.advancedDetails later
-            advancedModalBody.innerHTML = `<p>Details for ${member.name}. Advanced features coming soon!</p>`; // Placeholder
-            if (advancedCharacterModal) advancedCharacterModal.style.display = 'block';
+            if (advancedModalTitle) advancedModalTitle.textContent = `Import Pathbuilder Data for ${member.name || 'Character'}`;
+            if (pathbuilderIdInput) pathbuilderIdInput.value = '';
+            if (pathbuilderJsonOutput) pathbuilderJsonOutput.textContent = 'Enter Pathbuilder ID and click "Fetch".';
+            openModal(advancedCharacterModal);
+        } else {
+            console.error("Cannot open advanced modal: Member not found or modal element missing. Member ID:", memberId);
         }
     }
+
     function closeAdvancedModal() {
-        if (advancedCharacterModal) advancedCharacterModal.style.display = 'none';
+        if (advancedCharacterModal) closeModal(advancedCharacterModal);
         currentEditingMemberIdForAdvanced = null;
     }
-    if (closeAdvancedModalBtn) closeAdvancedModalBtn.addEventListener('click', closeAdvancedModal);
-    if (saveAdvancedDetailsBtn) {
-        saveAdvancedDetailsBtn.addEventListener('click', () => {
-            // Save advanced details logic here, update currentCampaignFullData
-            console.log("Saving advanced details for member ID:", currentEditingMemberIdForAdvanced);
-            closeAdvancedModal();
-            // Potentially trigger main save or indicate changes are pending
+
+    if (closeAdvancedModalBtn) { // Ensure HTML ID for close button inside #advancedCharacterModal matches
+        closeAdvancedModalBtn.addEventListener('click', closeAdvancedModal);
+    }
+    
+    if (fetchPathbuilderDataBtn) {
+        fetchPathbuilderDataBtn.addEventListener('click', async () => {
+            if (!pathbuilderIdInput || !pathbuilderJsonOutput) return;
+
+            const characterId = pathbuilderIdInput.value.trim();
+            if (!characterId) {
+                pathbuilderJsonOutput.textContent = 'Please enter a Pathbuilder Character ID.';
+                return;
+            }
+
+            pathbuilderJsonOutput.textContent = 'Fetching data...';
+            const apiUrl = `https://pathbuilder2e.com/json.php?id=${characterId}`;
+
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status} - ${response.statusText}. Pathbuilder ID might be invalid or private.`);
+                }
+                const data = await response.json();
+
+                if (data.success && data.build) {
+                    pathbuilderJsonOutput.textContent = JSON.stringify(data.build, null, 2);
+                    console.log("Pathbuilder data fetched:", data.build);
+                    
+                    if (currentEditingMemberIdForAdvanced && currentCampaignFullData && currentCampaignFullData.partyMembers) {
+                        const memberIndex = currentCampaignFullData.partyMembers.findIndex(m => m.id === currentEditingMemberIdForAdvanced);
+                        if (memberIndex > -1) {
+                            const memberToUpdate = currentCampaignFullData.partyMembers[memberIndex];
+                            const build = data.build;
+
+                            memberToUpdate.name = build.name || memberToUpdate.name;
+                            memberToUpdate.level = build.level || memberToUpdate.level;
+                            memberToUpdate.characterClass = build.class || memberToUpdate.characterClass;
+                            memberToUpdate.ancestry = build.ancestry || memberToUpdate.ancestry;
+                            memberToUpdate.sex = build.gender || memberToUpdate.sex; // Pathbuilder uses 'gender'
+                            memberToUpdate.age = build.age || memberToUpdate.age;
+                            memberToUpdate.deity = build.deity || memberToUpdate.deity;
+                            if (build.languages && Array.isArray(build.languages)) {
+                                memberToUpdate.languages = build.languages.join(', ');
+                            }
+                            // You can map more fields here:
+                            // memberToUpdate.notes = `Imported from Pathbuilder. Key Ability: ${build.keyability}. Alignment: ${build.alignment}. Background: ${build.background}. Heritage: ${build.heritage}. \n\n${memberToUpdate.notes || ''}`.trim();
+
+                            renderPartyMembers(); 
+                            
+                            alert(`Data for ${build.name} fetched and basic details updated! Review and click "Save Party Changes" to make it permanent.`);
+                            // closeModal(advancedCharacterModal); // Optionally close after successful fetch
+                        }
+                    }
+                } else {
+                    pathbuilderJsonOutput.textContent = `Error: Could not retrieve valid build data. Pathbuilder response: ${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                console.error('Error fetching Pathbuilder data:', error);
+                pathbuilderJsonOutput.textContent = `Fetch Error: ${error.message}. The API might be down, the ID invalid, or there might be a CORS issue. Check console for more details.`;
+            }
         });
     }
-     window.addEventListener('click', (event) => { // Close modals on outside click
-        if (event.target === noCampaignModalParty) closeNoCampaignModal();
-        if (event.target === advancedCharacterModal) closeAdvancedModal();
-    });
 
     // --- Delete Confirmation Modal Logic ---
-    function openDeleteConfirmModal(memberId, memberName) {
-        memberIdToDelete = memberId;
-        if (deleteConfirmMessage) {
-            deleteConfirmMessage.textContent = `Are you sure you want to delete "${memberName || 'this character'}"? This action will save all current party changes immediately.`;
+    if (deleteConfirmModal) { // Ensure modal element exists
+        if (closeDeleteConfirmModalBtn) closeDeleteConfirmModalBtn.addEventListener('click', closeDeleteConfirmModal);
+        if (cancelDeleteCharacterBtn) cancelDeleteCharacterBtn.addEventListener('click', closeDeleteConfirmModal);
+        if (confirmDeleteCharacterBtn) {
+            confirmDeleteCharacterBtn.addEventListener('click', () => {
+                if (memberIdToDelete && currentCampaignFullData && currentCampaignFullData.partyMembers) {
+                    const memberToDelete = currentCampaignFullData.partyMembers.find(m => m.id === memberIdToDelete);
+                    const memberName = memberToDelete ? memberToDelete.name : 'Character';
+
+                    currentCampaignFullData.partyMembers = currentCampaignFullData.partyMembers.filter(m => m.id !== memberIdToDelete);
+                    savePartyChanges(true); // Auto-save after delete
+                    renderPartyMembers(); 
+                    if (saveStatusParty) {
+                         saveStatusParty.textContent = `"${memberName}" deleted and party changes saved.`;
+                         setTimeout(() => {if(saveStatusParty) saveStatusParty.textContent = ""}, 4000);
+                    }
+                }
+                closeDeleteConfirmModal();
+            });
         }
-        if (deleteConfirmModal) deleteConfirmModal.style.display = 'block';
+    }
+
+    function openDeleteConfirmModal(id, name) { // Simplified from memberId, memberName
+        memberIdToDelete = id;
+        if (deleteConfirmMessage) {
+            deleteConfirmMessage.textContent = `Are you sure you want to delete "${name || 'this character'}"? This action will save all current party changes immediately.`;
+        }
+        if (deleteConfirmModal) openModal(deleteConfirmModal);
     }
 
     function closeDeleteConfirmModal() {
-        if (deleteConfirmModal) deleteConfirmModal.style.display = 'none';
-        memberIdToDelete = null; // Clear the stored ID
+        if (deleteConfirmModal) closeModal(deleteConfirmModal);
+        memberIdToDelete = null;
     }
-
-    if (closeDeleteConfirmModalBtn) {
-        closeDeleteConfirmModalBtn.addEventListener('click', closeDeleteConfirmModal);
-    }
-    if (cancelDeleteCharacterBtn) {
-        cancelDeleteCharacterBtn.addEventListener('click', closeDeleteConfirmModal);
-    }
-    // Add window click to close delete modal too
-    window.addEventListener('click', (event) => {
-        // ... (existing window click for other modals) ...
-        if (event.target === deleteConfirmModal) {
-            closeDeleteConfirmModal();
-        }
-    });
-
-    if (confirmDeleteCharacterBtn) {
-        confirmDeleteCharacterBtn.addEventListener('click', () => {
-            if (memberIdToDelete && currentCampaignFullData) {
-                const memberToDelete = currentCampaignFullData.partyMembers.find(m => m.id === memberIdToDelete);
-                const memberName = memberToDelete ? memberToDelete.name : 'Character';
-
-                currentCampaignFullData.partyMembers = currentCampaignFullData.partyMembers.filter(m => m.id !== memberIdToDelete);
-                
-                // Directly call savePartyChanges which also saves to cookies
-                savePartyChanges(true); // Pass a flag to indicate it's a delete-triggered save for custom message
-
-                renderPartyMembers(); // Re-render the list to update DOM
-
-                // Update save status (savePartyChanges will set its own, but we can be more specific)
-                if (saveStatusParty) {
-                     saveStatusParty.textContent = `"${memberName}" deleted and party changes saved.`;
-                     setTimeout(() => saveStatusParty.textContent = "", 4000);
-                }
-                
-                closeDeleteConfirmModal();
-            }
-        });
-    }
-
 
     // --- Campaign and Party Loading ---
     function loadFullCampaignData(campaignName) {
-    const campaignDataString = getCookie(CAMPAIGN_DATA_PREFIX + campaignName);
-    if (campaignDataString) {
-        try {
-            currentCampaignFullData = JSON.parse(campaignDataString);
-            if (!currentCampaignFullData.partyMembers) {
-                currentCampaignFullData.partyMembers = [];
-            }
+        const campaignDataString = getCookie(CAMPAIGN_DATA_PREFIX + campaignName);
+        if (campaignDataString) {
+            try {
+                currentCampaignFullData = JSON.parse(campaignDataString);
+                if (!currentCampaignFullData.partyMembers) currentCampaignFullData.partyMembers = [];
+                if (!currentCampaignFullData.sessions) currentCampaignFullData.sessions = []; // Ensure sessions array
 
-            // Ensure all members are collapsed on initial page load
-            currentCampaignFullData.partyMembers.forEach(member => {
-                member.isExpanded = false; // <<< ADD THIS LOOP
-            });
+                currentCampaignFullData.partyMembers.forEach(member => { member.isExpanded = false; });
 
-            originalLoadedCampaignName = currentCampaignFullData.name;
-            if (campaignNameDisplay) campaignNameDisplay.textContent = `Party Management for: ${currentCampaignFullData.name}`;
-            if (partyManagementContent) partyManagementContent.style.display = 'block';
-            renderPartyMembers();
-            return true;
-        } catch (e) {
-            console.error("Error parsing campaign data:", e);
-            currentCampaignFullData = null;
-            originalLoadedCampaignName = null;
-            // Ensure content is hidden and modal shown if error occurs
-            if (partyManagementContent) partyManagementContent.style.display = 'none';
-            if (campaignNameDisplay) campaignNameDisplay.textContent = `Party Management`;
+                originalLoadedCampaignName = currentCampaignFullData.name;
+                if (campaignNameDisplay) campaignNameDisplay.textContent = `Party Management for: ${currentCampaignFullData.name}`;
+                if (partyManagementContent) partyManagementContent.style.display = 'block';
+                renderPartyMembers();
+                return true;
+            } catch (e) { /* ... error handling ... */ }
         }
+        // Fallback if load fails
+        openNoCampaignModal();
+        if (partyManagementContent) partyManagementContent.style.display = 'none';
+        if (campaignNameDisplay) campaignNameDisplay.textContent = `Party Management`;
+        return false;
     }
-    // This part runs if campaignDataString is null OR if try-catch fails and doesn't return true
-    openNoCampaignModal();
-    if (partyManagementContent) partyManagementContent.style.display = 'none';
-    if (campaignNameDisplay) campaignNameDisplay.textContent = `Party Management`;
-    return false;
-}
+
+    // Helper for expansion toggle
+    const setupExpansionToggle = (cardElement, memberObject) => {
+        const header = cardElement.querySelector('.party-member-header');
+        const expandIcon = header ? header.querySelector('.expand-icon') : null;
+        if (header && expandIcon) {
+            header.addEventListener('click', (e) => {
+                if (e.target.closest('input, label, select, button') && !e.target.classList.contains('expand-icon') && e.target !== header && !header.contains(e.target.closest('h3'))) {
+                     return; // Don't toggle if click is on an interactive element within header (except icon/h3)
+                }
+                memberObject.isExpanded = !memberObject.isExpanded;
+                cardElement.classList.toggle('expanded');
+                expandIcon.textContent = memberObject.isExpanded ? '▼' : '►';
+            });
+        }
+    };
 
     function renderPartyMembers() {
+        if (!partyMembersContainer || !currentCampaignFullData || !currentCampaignFullData.partyMembers) {
+             if(partyMembersContainer) partyMembersContainer.innerHTML = '<p>No party members to display.</p>';
+            return;
+        }
+        partyMembersContainer.innerHTML = ''; 
+
+        if (currentCampaignFullData.partyMembers.length === 0) {
+            partyMembersContainer.innerHTML = '<p>No party members yet. Click "Add New Party Member" to start!</p>';
+        }
+
         currentCampaignFullData.partyMembers.forEach(member => {
             const card = document.createElement('div');
             card.className = 'party-member-card';
+            if (member.isExpanded) card.classList.add('expanded');
             card.dataset.memberId = member.id;
-            if (member.isExpanded) {
-                card.classList.add('expanded');
-            }
 
-            // MODIFIED PART: Buttons are now inside party-member-details
             card.innerHTML = `
                 <div class="party-member-header">
                     <h3>${member.name || 'Unnamed Character'}</h3>
@@ -247,7 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <select id="pm-sex-${member.id}" data-field="sex">
                             <option value="Male" ${member.sex === 'Male' ? 'selected' : ''}>Male</option>
                             <option value="Female" ${member.sex === 'Female' ? 'selected' : ''}>Female</option>
-                            <option value="Unknown" ${member.sex === 'Unknown' || !member.sex ? 'selected' : ''}>Unknown</option>
+                            <option value="Unknown" ${(!member.sex || member.sex === 'Unknown') ? 'selected' : ''}>Unknown</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -267,115 +329,74 @@ document.addEventListener('DOMContentLoaded', () => {
                         <textarea id="pm-notes-${member.id}" data-field="notes" rows="3">${member.notes || ''}</textarea>
                     </div>
                     <div class="form-group full-width party-member-inline-actions">
-                        <button class="btn btn-secondary advanced-btn">Advanced</button>
+                        <button class="btn btn-secondary advanced-btn">Advanced/Import</button>
                         <button class="btn btn-delete-member delete-member-btn">Delete</button>
                     </div>
                 </div>
             `;
-            // The div class="party-member-actions" that was previously here is now removed.
-
-            // ... (rest of the event listeners for header, inputs, advanced-btn, delete-member-btn remain the same) ...
-            // The querySelectors for '.advanced-btn' and '.delete-member-btn' will still work as they search within the `card`.
             
-            // Update data model on input change
+            setupExpansionToggle(card, member);
+            
             card.querySelectorAll('input, select, textarea').forEach(inputEl => {
-                // Use 'input' event for text fields and textareas for more immediate updates.
-                // Use 'change' for select and number inputs.
-                const eventType = (inputEl.tagName.toLowerCase() === 'select' || inputEl.type === 'number') 
-                                ? 'change' 
-                                : 'input';
-
+                const eventType = (inputEl.tagName.toLowerCase() === 'select' || inputEl.type === 'number') ? 'change' : 'input';
                 inputEl.addEventListener(eventType, (e) => {
                     const field = e.target.dataset.field;
                     let value = e.target.value;
-
                     if (e.target.type === 'number') {
                         value = parseInt(value, 10);
-                        // Handle NaN, e.g., if user deletes number or types non-numeric
-                        if (isNaN(value)) {
-                            value = (field === 'level' && e.target.min) ? parseInt(e.target.min, 10) : 0; 
-                        }
+                        if (isNaN(value)) { value = (field === 'level' && e.target.min) ? parseInt(e.target.min, 10) : 0; }
                     }
-                    
-                    member[field] = value; // Update the member object directly
-                    if (field === 'name') { // Update header if name changes
-                        card.querySelector('.party-member-header h3').textContent = value || 'Unnamed Character';
+                    member[field] = value;
+                    if (field === 'name') { 
+                        const headerH3 = card.querySelector('.party-member-header h3');
+                        if (headerH3) headerH3.textContent = value || 'Unnamed Character';
                     }
-                    // Optional: log to see immediate updates in the JS model
-                    // console.log(`Updated member ${member.id} - ${field}: ${value}`);
                 });
             });
 
-            const header = card.querySelector('.party-member-header');
-            header.addEventListener('click', () => {
-                member.isExpanded = !member.isExpanded; // Update the state
-                card.classList.toggle('expanded');      // Toggle the class for CSS
-                header.querySelector('.expand-icon').textContent = member.isExpanded ? '▼' : '►'; // Update icon
-            });
-
+            const advancedBtn = card.querySelector('.advanced-btn');
+            if (advancedBtn) advancedBtn.addEventListener('click', (e) => { e.stopPropagation(); openAdvancedModal(member.id); });
             
-            // MODIFIED Delete Button: Now opens the confirmation modal
             const deleteBtn = card.querySelector('.delete-member-btn');
-            if (deleteBtn) {
-                deleteBtn.addEventListener('click', () => {
-                    openDeleteConfirmModal(member.id, member.name);
-                });
-            }
+            if (deleteBtn) deleteBtn.addEventListener('click', (e) => { e.stopPropagation(); openDeleteConfirmModal(member.id, member.name); });
+            
             partyMembersContainer.appendChild(card);
         });
-         // Fallback: Force re-check if partyMembersContainer is empty after render if it shouldn't be
-        if (currentCampaignFullData.partyMembers.length > 0 && partyMembersContainer.children.length === 0) {
-            console.warn("Party members array has items, but DOM container is empty after render. Forcing one more render.");
-            // This is a heavy-handed fallback, ideally not needed.
-            // setTimeout(renderPartyMembers, 0); // Re-render on next tick
-        } else if (currentCampaignFullData.partyMembers.length === 0 && partyMembersContainer.children.length > 0) {
-            console.warn("Party members array is empty, but DOM container has children. Clearing.");
-            partyMembersContainer.innerHTML = '';
-        }
     }
 
     if (addNewPartyMemberBtn) {
         addNewPartyMemberBtn.addEventListener('click', () => {
-            if (!currentCampaignFullData) {
-                alert("Please load a campaign first.");
-                return;
-            }
+            if (!currentCampaignFullData) { alert("Please load a campaign first."); return; }
+            if (!currentCampaignFullData.partyMembers) currentCampaignFullData.partyMembers = []; // Defensive
+            
             const newMember = {
                 id: generateUniqueId(),
                 name: "New Character",
-                ancestry: "",
-                characterClass: "",
-                level: 1,
-                sex: "Unknown",
-                age: "",
-                deity: "",
-                languages: "",
-                notes: "",
-                isExpanded: true // Expand new members by default
+                ancestry: "", characterClass: "", level: 1, sex: "Unknown", age: "",
+                deity: "", languages: "", notes: "", isExpanded: true 
             };
             currentCampaignFullData.partyMembers.push(newMember);
             renderPartyMembers();
+            // Scroll to new member could be added here
+            const newCard = partyMembersContainer.querySelector(`[data-member-id="${newMember.id}"]`);
+            if(newCard) newCard.scrollIntoView({behavior: "smooth", block: "center"});
         });
-        
     }
 
-    // Modified savePartyChanges to accept an optional flag for message customization
+    // --- Save Party Changes ---
     function savePartyChanges(isTriggeredByDelete = false) {
         if (!currentCampaignFullData || !originalLoadedCampaignName) {
-            if(saveStatusParty) {
-                saveStatusParty.textContent = "No campaign loaded to save.";
-                setTimeout(() => saveStatusParty.textContent = "", 3000);
-            }
+            if(saveStatusParty) { saveStatusParty.textContent = "No campaign loaded to save."; setTimeout(() => {if(saveStatusParty)saveStatusParty.textContent = ""}, 3000); }
             return;
         }
         setCookie(CAMPAIGN_DATA_PREFIX + originalLoadedCampaignName, JSON.stringify(currentCampaignFullData), 365);
         setCookie(LAST_VIEWED_CAMPAIGN_KEY, originalLoadedCampaignName, 365);
         
-        if (saveStatusParty && !isTriggeredByDelete) { // Only show generic save if not from delete
+        if (saveStatusParty && !isTriggeredByDelete) {
             saveStatusParty.textContent = `Party changes for "${originalLoadedCampaignName}" saved!`;
-            setTimeout(() => saveStatusParty.textContent = "", 3000);
+            setTimeout(() => {if(saveStatusParty)saveStatusParty.textContent = ""}, 3000);
         }
-        console.log("Party changes saved for campaign:", originalLoadedCampaignName, currentCampaignFullData);
+        console.log("Party changes saved for campaign:", originalLoadedCampaignName);
     }
 
     if (savePartyChangesBtn) {
@@ -386,7 +407,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keydown', function(event) {
         if ((event.ctrlKey || event.metaKey) && event.key === 's') {
             event.preventDefault();
-            console.log("Ctrl+S pressed, saving party changes...");
             savePartyChanges(false);
         }
     });
@@ -398,18 +418,17 @@ document.addEventListener('DOMContentLoaded', () => {
             loadFullCampaignData(campaignNameToLoad);
         } else {
             openNoCampaignModal();
-            partyManagementContent.style.display = 'none';
-            campaignNameDisplay.textContent = 'Party Management';
+            if(partyManagementContent) partyManagementContent.style.display = 'none';
+            if(campaignNameDisplay) campaignNameDisplay.textContent = 'Party Management';
         }
-         // Navigation highlighting
-        document.querySelectorAll('.top-bar nav ul li a').forEach(link => {
-            if (link.getAttribute('href') === 'partymanagement.html') {
-                link.classList.add('active');
-            } else {
-                link.classList.remove('active');
-            }
-        });
     }
 
     initializePartyPage();
+
+    // Consolidate window click listener for modals
+    window.addEventListener('click', (event) => {
+        if (noCampaignModalParty && event.target === noCampaignModalParty) closeNoCampaignModal();
+        if (advancedCharacterModal && event.target === advancedCharacterModal) closeAdvancedModal();
+        if (deleteConfirmModal && event.target === deleteConfirmModal) closeDeleteConfirmModal();
+    });
 });

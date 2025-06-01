@@ -158,14 +158,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function initializeHomePage() {
         const campaignNames = getAllCampaignNames();
         displayCampaigns(campaignNames);
-
-        document.querySelectorAll('.top-bar nav ul li a').forEach(link => {
-            if (link.getAttribute('href') === '') {
-                link.classList.add('active');
-            } else {
-                link.classList.remove('active');
-            }
-        });
     }
 
     initializeHomePage();

@@ -7,10 +7,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveAllHomebrewBtn = document.getElementById('saveAllHomebrewBtn');
     const saveStatusHomebrew = document.getElementById('saveStatusHomebrew');
 
-    // Sort and Filter Controls
+    // Sort and Filter Controls (ensure these IDs match your HTML for homebrewcatalog.html)
     const sortAssetsBySelect = document.getElementById('sortAssetsBy');
     const reverseSortBtn = document.getElementById('reverseSortBtn');
-    const filterPanel = document.getElementById('filterPanel'); 
+    const filterPanel = document.getElementById('filterPanel'); // The <aside> element
 
     // No Campaign Modal (Using IDs from your HTML's newUserModal)
     const noCampaignModalHomebrew = document.getElementById('newUserModal');
@@ -18,12 +18,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalCreateNewCampaignBtnHomebrew = document.getElementById('createNewCampaignBtn'); 
     const modalViewCatalogAnywayBtn = document.getElementById('importCampaignBtn'); 
 
-    // Edit Creature Modal (Functionality is redirect, these are for basic open/close)
-    const editCreatureModal = document.getElementById('editCreatureModal');
+    // Edit Creature Modal (Functionality is redirect)
+    const editCreatureModal = document.getElementById('editCreatureModal'); // Keep if HTML structure exists
     const closeEditCreatureModalBtn = editCreatureModal ? editCreatureModal.querySelector('.close-edit-creature-modal-btn') : null;
-    // const editCreatureModalTitle = document.getElementById('editCreatureModalTitle'); // If needed by other logic
-    // const editCreatureModalBody = document.getElementById('editCreatureModalBody'); // If needed
-    // const saveEditedCreatureBtn = document.getElementById('saveEditedCreatureBtn'); // If needed
 
     // Delete Asset Confirm Modal
     const deleteAssetConfirmModal = document.getElementById('deleteAssetConfirmModal');
@@ -33,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const cancelDeleteAssetBtn = document.getElementById('cancelDeleteAssetBtn');
     let assetToDelete = { id: null, type: null, name: null };
 
-    // Add New Item Modal (Ensure IDs match your HTML)
+    // Add New Item Modal (Ensure IDs match your HTML for the item creation modal)
     const addNewItemModal = document.getElementById('addNewItemModal');
     const closeAddNewItemModalBtn = document.getElementById('closeAddNewItemModalBtn');
     const addNewItemForm = document.getElementById('addNewItemForm');
@@ -42,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const newItemDescriptionInput = document.getElementById('newItemDescription');
     const cancelNewItemBtn = document.getElementById('cancelNewItemBtn');
 
-    // Add New Spell Modal (Ensure IDs match your HTML)
+    // Add New Spell Modal (Ensure IDs match your HTML for the spell creation modal)
     const addNewSpellModal = document.getElementById('addNewSpellModal');
     const closeAddNewSpellModalBtn = document.getElementById('closeAddNewSpellModalBtn');
     const addNewSpellForm = document.getElementById('addNewSpellForm');
@@ -50,6 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const newSpellRequiredLevelInput = document.getElementById('newSpellRequiredLevel');
     const newSpellDescriptionInput = document.getElementById('newSpellDescription');
     const cancelNewSpellBtn = document.getElementById('cancelNewSpellBtn');
+
 
     // --- Storage Keys & Data ---
     const LAST_VIEWED_CAMPAIGN_KEY = 'ttrpgSuite_lastViewedCampaign';
@@ -60,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let allHomebrewAssets = { creatures: [], items: [], spells: [] };
     let currentSort = { property: 'alphabetical', reversed: false };
-    let currentFilters = { creature: true, item: true, spell: true };
+    let currentFilters = { creature: true, item: true, spell: true }; // Default: all checked
 
     const NUM_COLUMNS = 2; // Define number of columns for asset display
 
@@ -97,20 +95,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // --- "No Campaign" Modal Logic ---
-    if(noCampaignModalHomebrew) { // Check if modal element exists
+    if(noCampaignModalHomebrew) {
         if(closeModalHomebrewBtn) closeModalHomebrewBtn.addEventListener('click', () => closeModal(noCampaignModalHomebrew));
         if(modalViewCatalogAnywayBtn && modalViewCatalogAnywayBtn.id === 'importCampaignBtn') { 
             modalViewCatalogAnywayBtn.addEventListener('click', () => {
+                // Assuming this button means "View Catalog Anyway" despite its ID/HTML text
                 closeModal(noCampaignModalHomebrew);
             });
         }
         if (modalCreateNewCampaignBtnHomebrew) {
             modalCreateNewCampaignBtnHomebrew.addEventListener('click', () => {
                 const newCampaignName = "New Campaign";
-                const dummyCampaignData = { name: newCampaignName, description: "A new adventure begins!", genre: "Fantasy", maturityRating: "TV-14", partyMembers: [] };
+                const dummyCampaignData = { 
+                    name: newCampaignName, 
+                    description: "A new adventure begins!", 
+                    genre: "Fantasy", 
+                    maturityRating: "TV-14", 
+                    partyMembers: [], 
+                    sessions: [] // Ensure new campaigns have session array
+                };
                 setCookie(CAMPAIGN_DATA_PREFIX + newCampaignName, JSON.stringify(dummyCampaignData), 365);
                 setCookie(LAST_VIEWED_CAMPAIGN_KEY, newCampaignName, 365);
-                window.location.href = '../index.html'; // Main Campaign Details page
+                window.location.href = '../index.html'; // Adjust to your Campaign Details page path
             });
         }
     }
@@ -199,10 +205,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }
-
+    
     function handleAddNewAsset(type) {
         if (type === 'creature') {
-            window.location.href = '../creature-generator'; // Adjust path
+            window.location.href = '../creature-generator'; // Adjust path as needed
         } else if (type === 'item') {
             if (addNewItemForm) addNewItemForm.reset();
             openModal(addNewItemModal); 
@@ -222,6 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
         params.append('id', creature.id);
         params.append('name', creature.name);
         params.append('level', creature.level);
+        // Add all relevant creature properties to params...
         const statsToParam = ['armorClass', 'hitPoints', 'speed', 'attrMod', 'perception', 'skills', 'savingThrows', 'strikeAtkBonus', 'strikeDmg', 'resistAndWeak'];
         statsToParam.forEach(statKey => {
             if (creature[`${statKey}_tier`]) params.append(`${statKey}_tier`, creature[`${statKey}_tier`]);
@@ -240,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Delete Asset Modal & Logic ---
-    if(deleteAssetConfirmModal) {
+    if(deleteAssetConfirmModal) { // Ensure modal element exists
         if(closeDeleteAssetConfirmModalBtn) closeDeleteAssetConfirmModalBtn.addEventListener('click', () => closeModal(deleteAssetConfirmModal));
         if(cancelDeleteAssetBtn) cancelDeleteAssetBtn.addEventListener('click', () => closeModal(deleteAssetConfirmModal));
         if(confirmDeleteAssetBtn) {
@@ -251,12 +258,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     if (allHomebrewAssets[typePlural]) {
                         allHomebrewAssets[typePlural] = allHomebrewAssets[typePlural].filter(asset => asset.id !== assetToDelete.id);
-                        saveHomebrewAssets(typePlural); // Save the specific list that changed
+                        saveHomebrewAssets(typePlural);
                         listChanged = true;
                     }
                     
                     if (listChanged) {
-                        processAndRenderAssets();
+                        processAndRenderAssets(); // Refresh display
                         if(saveStatusHomebrew) {
                             saveStatusHomebrew.textContent = `"${assetToDelete.name || 'Asset'}" deleted.`;
                             setTimeout(() => {if(saveStatusHomebrew)saveStatusHomebrew.textContent = ''}, 3000);
@@ -288,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem(storageKey, JSON.stringify(allHomebrewAssets[assetTypeKeyPlural]));
                 console.log(`${assetTypeKeyPlural} saved to localStorage using key ${storageKey}.`);
             } else {
-                console.warn("Invalid asset type key for saving or key constant not found:", assetTypeKeyPlural, storageKey);
+                console.warn("Invalid asset type key for saving:", assetTypeKeyPlural);
             }
         } catch (e) {
             console.error(`Error saving ${assetTypeKeyPlural} to localStorage:`, e);
@@ -304,25 +311,33 @@ document.addEventListener('DOMContentLoaded', () => {
             allHomebrewAssets.spells = JSON.parse(localStorage.getItem(HOMEBREW_SPELLS_KEY) || '[]').map(s => ({...s, assetType: 'spell', isExpanded: false, createdAt: s.createdAt || now}));
         } catch (e) {
             console.error("Error loading homebrew assets from localStorage:", e);
-            allHomebrewAssets = { creatures: [], items: [], spells: [] }; // Reset on error
+            allHomebrewAssets = { creatures: [], items: [], spells: [] };
         }
         processAndRenderAssets(); // This will filter, sort, and then render
     }
     
     // --- Sorting and Filtering Logic ---
     function applyFiltersAndSort() {
+        // Ensure assetType is present on all loaded assets for reliable filtering
         let combinedAssets = [
-            ...allHomebrewAssets.creatures,
-            ...allHomebrewAssets.items,
-            ...allHomebrewAssets.spells
-        ];
+            ...(allHomebrewAssets.creatures || []),
+            ...(allHomebrewAssets.items || []),
+            ...(allHomebrewAssets.spells || [])
+        ].map(asset => ({ // Ensure assetType is part of each object if not already
+            ...asset, 
+            assetType: asset.assetType || (allHomebrewAssets.creatures.includes(asset) ? 'creature' : (allHomebrewAssets.items.includes(asset) ? 'item' : 'spell'))
+        }));
+
 
         // Apply Filters
         if (currentFilters && Object.keys(currentFilters).length > 0) {
             const activeAssetTypes = Object.keys(currentFilters).filter(type => currentFilters[type]);
-            combinedAssets = combinedAssets.filter(asset => asset.assetType && activeAssetTypes.includes(asset.assetType));
+            if (activeAssetTypes.length > 0) { // Only filter if some types are selected
+                 combinedAssets = combinedAssets.filter(asset => asset.assetType && activeAssetTypes.includes(asset.assetType));
+            } else { // If no filters checked, show nothing (or everything, depending on desired behavior)
+                combinedAssets = []; // Show nothing if no filter is active
+            }
         }
-
 
         // Apply Sort
         if (currentSort && currentSort.property) {
@@ -386,7 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
             header.addEventListener('click', () => {
                 assetObject.isExpanded = !assetObject.isExpanded;
                 cardElement.classList.toggle('expanded');
-                expandIcon.textContent = assetObject.isExpanded ? '▼' : '►';
+                //expandIcon.textContent = assetObject.isExpanded ? '▼' : '►';
             });
         }
     };
@@ -394,7 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Render Assets into Columns ---
     function renderHomebrewAssets(assetsToRender) {
         if (!homebrewAssetsColumnsContainer) {
-            console.error("Asset container not found!");
+            console.error("Asset columns container #homebrewAssetsContainer not found!");
             return;
         }
         homebrewAssetsColumnsContainer.innerHTML = ''; 
@@ -404,6 +419,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // Create column divs
         const columns = [];
         for (let i = 0; i < NUM_COLUMNS; i++) {
             const columnDiv = document.createElement('div');
@@ -412,26 +428,30 @@ document.addEventListener('DOMContentLoaded', () => {
             homebrewAssetsColumnsContainer.appendChild(columnDiv);
         }
 
+        // Distribute assets into columns
         assetsToRender.forEach((asset, index) => {
             const columnIndex = index % NUM_COLUMNS;
             const card = createAssetCard(asset); 
             if (columns[columnIndex]) {
                 columns[columnIndex].appendChild(card);
             } else {
-                // Fallback if NUM_COLUMNS is 0 or an issue occurs
-                homebrewAssetsColumnsContainer.appendChild(card); 
+                console.error("Error: Column index out of bounds during rendering.");
+                // Fallback: append to main container if columns somehow fail
+                homebrewAssetsColumnsContainer.appendChild(card);
             }
         });
     }
 
-    function createAssetCard(asset) {
+    function createAssetCard(asset) { // asset should have assetType property
         const card = document.createElement('div');
         card.className = `homebrew-asset-card ${asset.assetType}-card`;
         if (asset.isExpanded) card.classList.add('expanded');
         card.dataset.assetId = asset.id;
 
         let contentHtml = '';
-        let headerName = asset.name || `New ${asset.assetType.charAt(0).toUpperCase() + asset.assetType.slice(1)}`;
+        const assetTypeDisplay = asset.assetType ? asset.assetType.charAt(0).toUpperCase() + asset.assetType.slice(1) : 'Asset';
+        let headerName = asset.name || `New ${assetTypeDisplay}`;
+
 
         if (asset.assetType === 'creature') {
             let creatureDetailsHtml = '<div class="creature-full-details">';
@@ -506,9 +526,9 @@ document.addEventListener('DOMContentLoaded', () => {
         card.innerHTML = `
             <div class="homebrew-asset-header">
                 <h3>${headerName}</h3> 
-                <div>
-                    <span class="asset-type-badge">${asset.assetType.charAt(0).toUpperCase() + asset.assetType.slice(1)}</span>
-                    <span class="expand-icon">${asset.isExpanded ? '▼' : '►'}</span>
+                <div class="homebrew-asset-subdiv">
+                    <span class="asset-type-badge">${assetTypeDisplay}</span>
+                    <div class="expand-icon">►</div>
                 </div>
             </div>
             <div class="homebrew-asset-content">
@@ -530,7 +550,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const field = e.target.dataset.field;
                     if(field) {
                         asset[field] = e.target.value;
-                        if (field === 'name') { // If input field for name changes, update header
+                        if (field === 'name') {
                             const nameDisplayH3 = card.querySelector('.homebrew-asset-header h3');
                             if(nameDisplayH3) nameDisplayH3.textContent = e.target.value || `New ${asset.assetType.charAt(0).toUpperCase() + asset.assetType.slice(1)}`;
                         }
@@ -583,32 +603,6 @@ document.addEventListener('DOMContentLoaded', () => {
             reverseSortBtn.title = currentSort.reversed ? "Sort Ascending" : "Sort Descending";
         }
 
-        // Navigation highlighting
-        const navLinks = document.querySelectorAll('.top-bar nav ul li a');
-        const homebrewCatalogPageName = "homebrewcatalog.html"; 
-        // const currentPath = window.location.pathname.split("/").pop() || homebrewCatalogPageName; 
-        // More robust current page check for various server setups
-        const currentActualPath = window.location.pathname;
-
-
-        navLinks.forEach(link => {
-            link.classList.remove('active');
-            const linkHref = link.getAttribute('href');
-            if (linkHref) {
-                // Check if the link's href attribute, when resolved, matches the current page's path
-                // This handles relative paths like "" or "../" more robustly
-                const resolvedLink = new URL(linkHref, window.location.href).pathname;
-                if (resolvedLink === currentActualPath || 
-                   (currentActualPath.endsWith('/') && resolvedLink === currentActualPath + homebrewCatalogPageName) ||
-                   (linkHref === "" && currentActualPath.endsWith('/homebrew/') || currentActualPath.endsWith('/homebrew/index.html')) // For href=""
-                   ) {
-                     // Additional check for the specific "Homebrew Catalog" link
-                    if (link.textContent.trim().toLowerCase() === "homebrew catalog") {
-                        link.classList.add('active');
-                    }
-                }
-            }
-        });
     }
 
     initializeCatalogPage();
@@ -621,13 +615,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         if (noCampaignModalHomebrew && event.target === noCampaignModalHomebrew) closeModal(noCampaignModalHomebrew);
-        if (editCreatureModal && event.target === editCreatureModal) closeModal(editCreatureModal);
+        if (editCreatureModal && event.target === editCreatureModal) closeModal(editCreatureModal); // For the placeholder modal
         if (deleteAssetConfirmModal && event.target === deleteAssetConfirmModal) closeModal(deleteAssetConfirmModal);
-        if (addNewItemModal && event.target === addNewItemModal) { // Add this
+        if (addNewItemModal && event.target === addNewItemModal) { 
             closeModal(addNewItemModal);
             if(addNewItemForm) addNewItemForm.reset();
         }
-        if (addNewSpellModal && event.target === addNewSpellModal) { // Add this
+        if (addNewSpellModal && event.target === addNewSpellModal) { 
             closeModal(addNewSpellModal);
             if(addNewSpellForm) addNewSpellForm.reset();
         }

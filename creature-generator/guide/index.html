@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creature Guide - Pathplanner 2e</title>
+    <link rel="icon" href="/games/img/pathplanner_icon.png">
+    <link rel="stylesheet" href="../../css/index.css">
+    <meta name="darkreader-lock">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="top-bar">
+        <div class="logo">Pathplanner 2e Help</div>
+        <nav>
+            <ul>
+                <li><a href="../../">Home</a></li>
+                <li><a href="../../campaign">Campaign Details</a></li>
+                <li><a href="../../sessions">Sessions</a></li>
+                <li><a href="../../party">Party Management</a></li>
+                <li><a href="../../homebrew">Homebrew Catalog</a></li>
+                <li><a href="../">Creature Generator</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main id="guide-container" class="container">
+        <h1>Creature Generator Guide</h1>
+        <h2>Table of Contents</h2>
+        <ul>
+            <li><a class="table-contents-link" href="#welcome">Welcome</a></li>
+            <li><a class="table-contents-link" href="#getting-started">Getting Started</a></li>
+            <li><a class="table-contents-link" href="#saving-and-exporting">Saving and Exporting</a></li>
+            <li><a class="table-contents-link" href="#editing-creatures">Editing Creatures</a></li>
+            <li><a class="table-contents-link" href="#balancing-creatures">Balancing Creatures</a></li>
+            <li><a class="table-contents-link" href="#how-the-generator-works">How the Generator Works</a></li>
+        </ul>
+        <h2 id="welcome">Welcome</h2>
+        <p>Welcome to the Creature Generator guide for Pathplanner 2e! This tool allows you to create custom creatures for your campaigns, enhancing the gameplay experience.</p>
+        <p>I'd like to thank you, dear user, for taking the time to read this guidance page. Many people don't take time out to learn how to use even the simplest of tools, and often end up frustratedly blaming the toolmaker.</p>
+        <h2 id="getting-started">Getting Started</h2>
+        <p>To create a new creature, click on the "Creature Generator" tab in the navigation header, or click "Creature" from asset creation menu in the Homebrew Catalog. This will open a creature template where you can fill in details such as name and level, and adjust various attributes to your liking.</p>
+        <p>The Creature Generator comes equipped with numerous tools to help you craft a fair and balanced creature in as little time as possible. Each attribute of a creature is controlled by "tiers" of that attribute. For example, if a level five (5) creature's health stat is around 91, that is considered High HP. Note: If the creature you create is to have the ability to fly, use its fly speed as its movement speed by selecting "Custom" as the speed tier.</p>
+        <p>These tiers were patterned after the original Pathfinder 2e documentation, which can be found in the <a href="https://2e.aonprd.com/Rules.aspx?ID=2874", target="_blank">Archives of Nethys</a>. You can preview the values for each tier by checking the Stat Suggestions panel on the right.</p>
+        <h2 id="saving-and-exporting">Saving and Exporting Creatures</h2>
+        <p>Once you have finished creating a creature, you can save it to your Homebrew Catalog by clicking the "Save Creature" button at the bottom of the webpage, or by pressing Ctrl + S. This will allow you to access and edit your creature later from the Homebrew Catalog. Saved creatures, just like all other assets, are stored in document cookies. These are stored locally on your machine, and are not shared between computers/browsers. If you would like to save your campaign to a file for exporting, please read the section on <a href="../../guide#exporting">Exporting Campaigns</a> in the general guide.</p>
+        <p>To export creatures for use in other campaigns, you can simply click the "Export" button at the bottom of the Creature Generator webpage. This will copy a link to your clipboard, which when pasted into a browser will navigate to the Creature Generator webpage, and automatically fill in the creature's information into the form.</p>
+        <h2 id="editing-creatures">Editing Creatures</h2>
+        <p>Once you have created a creature, you can edit its attributes by clicking on the "Edit" button in the creature's detailed menu from the Homebrew Catalog. This will allow you to modify the creature's stats, abilities, and other details, without the hastle of recreating the creature from scratch.</p>
+        <h2 id="balancing-creatures">Balancing Creatures</h2>
+        <p>Balancing creatures is a very delicate task, especially if the DM wants to create quick and enjoyable encounters. To assist in ensuring encounters were as fair and balanced as possible, there are helpful statistics and warnings for the user to acknowledge while creating a creature.</p>
+        <p><em>Remember: Overpowered or invinvible creatures in any encounter are almost never fun to deal with. Do not rely on your players' abilities to solve a puzzle or find a weak spot to defeat the enemy, unless it specifically pertains to the story, as any character death caused by such design will feel contrived and undeserved. If the party should flee to survive, make it obvious.</em></p>
+        <p><em>Remember: If something unforseen happens during a session that would cause a future encounter to become unbalanced in either direction, don't be afriad to rebalance the encounter! Pathfinder should be a fun and fair experience for the players and the DM. Don't let your preparations hinder your crafted storyline and experience.</em></p>
+        <h3>Creature Statistics</h3>
+        <p>At the bottom of the Creature Generator viewport, there is a statistics panel that displays various information about the creature you are creating. The core traits are shown in a graph designed to display the power scaling of the creature relative to its level. These traits are Speed, Offensive Ability, and Vitality.</p>
+        <h4>Speed</h4>
+        <p>Speed is the creature's movement speed, which is typically 25 feet for most humanoid creatures. This can be adjusted based on the creature's type and abilities, and should generally remain under 30 feet so that the party members do not have immense difficulty trying to reach the creature. Creatures that have the ability to fly generally have very fast movement speed while airborn, which is why this stat is so important. Players may grow frustrated if a creature becomes difficult to kill purely because it is difficult to reach.</p>
+        <h4>Offensive Ability</h4>
+        <p>Offensive Ability is a measure of the creature's damage output and attack capabilities. This includes its attack bonus, damage per round, and any special abilities that enhance its offensive potential. The Offensive Ability should be balanced with the creature's level to ensure that it provides a fair challenge without being overwhelmingly powerful.</p>
+        <h4>Vitality</h4>
+        <p>Vitality is the creature's health and resilience, which is determined by its hit points and defenses. A creature with high vitality can withstand more damage and pose a greater threat to the party. However, if a creature has too much vitality relative to its level, it may become a frustrating encounter for players. To make a high-vitality encounter more fun for players, try raising the HP of the creature instead of boosting its Armor Class.</p>
+        <h3>Creature Warnings</h3>
+        <p>As you create a creature, the Creature Generator will provide warnings if certain attributes are out of balance. These warnings are designed to help you create a fair and enjoyable encounter for your players. If you see a warning, you should consider adjusting the creature's stats or abilities to bring them in line with the recommended values for its level. Here are some general balancing rules to help make your creature into a fair but enjoyable encounter and avoid warnings:</p>
+        <h4 id="three-two-one-rule">The 3-2-1 Rule</h4>
+        <p style="margin-bottom: 0;">When designing a balanced creature with a core mechanic, ensure the core mechanic is the only trait heavily emphasized. The normalized rank of the core attribute should be about three times as much as the least ranked attribute, and the last trait should lie somewhere in between. An easy way to tell if your creature follows this rule is if the graph of the core traits looks close to a right scalene triangle, like the examples shown below.</p>
+        <div style="display: flex; flex-direction: row; justify-content: center; margin-bottom: 20px; margin-top: 0; margin-left: -1%; width: 102%;">
+            <div id="diagnosticsPanel" style="width: 50%; position: inherit;">
+                <div class="diagnostics-column diagnostics-graph-area">
+                    <svg id="diagnosticsHexagonSVG" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+                        <defs>
+                            <polygon id="hexagonShape" points="50,5 93.3,27.5 93.3,72.5 50,95 6.7,72.5 6.7,27.5"></polygon>
+                        </defs>
+                        <use xlink:href="#hexagonShape" class="hexagon-background"></use>
+                        <polygon id="statsTriangle" class="stats-triangle-shape" points="50.00,27.50 14.93,70.25 60.39,56.00"></polygon>
+                        <text x="50" y="19" class="diag-label" text-anchor="middle">Spd</text>
+                        <text x="10" y="88" class="diag-label" text-anchor="middle">Atk</text>
+                        <text x="90" y="88" class="diag-label" text-anchor="middle">Def</text>
+                    </svg>
+                </div>
+                <div class="diagnostics-column diagnostics-info-area">
+                    <h4>Stat Profile:</h4>
+                    <p>Speed: <span id="diagSpeedActual">25</span><span> (norm: </span><span id="diagSpeedScore">0.50</span><span>)</span></p>
+                    <p>Offense Tier Avg: <span id="diagOffenseScore">4.5 of 5 (norm: 0.90)</span></p>
+                    <p>Vitality Tier Avg: <span id="diagVitalityScore">1.3 of 5 (norm: 0.27)</span></p>
+                </div>
+            </div>
+            <div id="diagnosticsPanel" style="width: 50%; position: inherit;">
+                <div class="diagnostics-column diagnostics-graph-area">
+                    <svg id="diagnosticsHexagonSVG" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+                        <defs>
+                            <polygon id="hexagonShape" points="50,5 93.3,27.5 93.3,72.5 50,95 6.7,72.5 6.7,27.5"></polygon>
+                        </defs>
+                        <use xlink:href="#hexagonShape" class="hexagon-background"></use>
+                        <polygon id="statsTriangle" class="stats-triangle-shape" points="50.00,27.50 40.26,55.63 86.37,71.00"></polygon>
+                        <text x="50" y="19" class="diag-label" text-anchor="middle">Spd</text>
+                        <text x="10" y="88" class="diag-label" text-anchor="middle">Atk</text>
+                        <text x="90" y="88" class="diag-label" text-anchor="middle">Def</text>
+                    </svg>
+                </div>
+                <div class="diagnostics-column diagnostics-info-area">
+                    <h4>Stat Profile:</h4>
+                    <p>Speed: <span id="diagSpeedActual">25</span><span> (norm: </span><span id="diagSpeedScore">0.50</span><span>)</span></p>
+                    <p>Offense Tier Avg: <span id="diagOffenseScore">1.3 of 5 (norm: 0.25)</span></p>
+                    <p>Vitality Tier Avg: <span id="diagVitalityScore">4.7 of 5 (norm: 0.93)</span></p>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <h4>The 15/50-minute Rule</h4>
+        <p>Boss encounters that last multiple hours tend to become stale or uninteresting fairly quickly. It follows that lower-level encounters should take much less time to complete, or else they will be seen extremely boring. Non-boss and low-level encounters should last at most 15 minutes. High-level and boss encounters should take about 50 minutes, on average. This general rule helps emphasize a boss' importance to the campaign and makes it feel more like a momumental victory when the boss is defeated. As mentioned earlier, do not raise the Armor Class of the creature to extend the length of an encounter. Instead, raise the HP of the creature so the players feel like they can accomplish something most turns.</p>
+        <p>An important side note is that, by placing multiple of the same creature in an encounter, the time to kill all creatures <em>does not scale linearly</em>. The required time for an encounter may be expected to last anywhere from 1.5-3 times as long by adding an additional creature, depending on the party's affinity with AOE attacks. A good visual for how stacking like enemies in an encounter affects time is shown below.</p>
+        <svg id="nonlinear-svg" style="width: 50%; height: auto; margin: -30px;"></svg>
+        <hr>
+        <h4>Damage Limit Rule</h4>
+        <p>To ensure that creatures do not deal excessive damage with a single attack, the generator will warn you if the creature's maximum damage output exceeds a certain threshold (relative to the party's stats). This is to prevent encounters from becoming too lethal for the party. If you see this warning, consider reducing the creature's damage output or adjusting its abilities to make it less punishing. It is bad game design to create an encounter with no tolerance for failure.</p>
+        <h2 id="how-the-generator-works">How the Generator Works</h2>
+        <p>The Creature Generator uses a combination of predefined templates and user inputs to create custom creatures. When you fill out the creature form, the generator calculates various attributes based on the level of the creature you select.</p>
+        <h3>Calculating Stat Profile</h3>
+        <h4>Speed</h4>
+        <p>The generator calculates normal of the creature's speed based on the formula <code>Math.floor((customSpeedValue / 5) - 2)</code> to determine the speed tier.</p>
+        <h4>Offensive Ability</h4>
+        <p>The Offensive Ability is calculated based on the creature's Strike Attack Bonus and Strike Damage, as well as Spell Attack Modifier and Area Damage if the creature is magical, using the formula <code>Math.min(1, avgOffenseTier / MAX_DIAGNOSTIC_TIER_NORMALIZATION)</code> to determine the average offense tier (pre-weighted). Area Damage is naturally weighted higher due to its ability to affect multiple targets.</p>
+        <h4>Vitality</h4>
+        <p>The Vitality is calculated based on the creature's Hit Points, Armor Class, and Saving Throws, using the formula <code>Math.min(1, avgVitalityTier / MAX_DIAGNOSTIC_TIER_NORMALIZATION)</code> to determine the average vitality tier (pre-weighted). Armor Class is naturally weighted higher due to its sever (and sometimes really annoying) impact on gameplay.</p>
+        <h4>Time to Kill</h4>
+        <p>The Time to Kill is calculated based on the creature's Hit Points and the average damage output of the party, using the formula <code>((1.2 * campaignPartyStats.avgLevel) + 6) * campaignPartyStats.numMembers</code> to calculate the average damage that could be dealt to the creature per round assuming and Armor Class of zero (<code>partyDamageFactor</code>). Estimated time to kill (in seconds) is then calculated from the formula <code>(creatureHP / partyDamageFactor) * (acTier / 1.5) * (speedTier / 2.5) * (savingThrowsTier / 1.5) * 120</code>. If you're wondering how I assembled the formula for player damage per level, see <a href="https://rpg.stackexchange.com/a/200620" target="_blank">this Stack Exchange post</a>.</p>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Pathplanner 2e. All rights reserved. This app is <a href="https://github.com/EvanderIV/pathplanner-2e" class="open-source-link" target="_blank">open source</a>.</p>
+    </footer>
+</body>
+<script>
+function drawNonlinearGrowthSVG(targetElementId, options = {}) {
+    const defaults = {
+        // SVG and Drawing parameters
+        svgWidth: 600,
+        svgHeight: 400,
+        padding: 50,    // Padding around the graph area
+        numPoints: 200, // Number of points to calculate for the curve
+        xMin: 2.1,      // Min x-value (ensure xMin > c for log)
+        xMax: 20,       // Max x-value
+        strokeColor: "steelblue",
+        strokeWidth: 2,
+
+        // Mathematical function parameters
+        a: 1,        // Exponential part: a * e^(kx)
+        k: 0.5,
+        b: 5,        // Logarithmic part: b * ln(x-c) + d_val
+        c: 2,
+        d_val: 10,
+        m: 1,        // Switching function: S(x) = 1 / (1 + e^(m*(x-x0)))
+        x0: 5        // Transition center
+    };
+
+    const config = { ...defaults, ...options };
+
+    const svgElement = document.getElementById(targetElementId);
+    if (!svgElement) {
+        console.error(`SVG element with id "${targetElementId}" not found.`);
+        return;
+    }
+
+    // Clear previous drawing
+    svgElement.innerHTML = '';
+
+    // Set SVG dimensions and viewBox
+    svgElement.setAttribute("width", config.svgWidth);
+    svgElement.setAttribute("height", config.svgHeight);
+    svgElement.setAttribute("viewBox", `0 0 ${config.svgWidth} ${config.svgHeight}`);
+
+    // --- Mathematical functions ---
+    // E(x) = a * e^(kx)
+    const expPart = (x_val) => config.a * Math.exp(config.k * x_val);
+
+    // L(x) = b * ln(x-c) + d_val
+    const logPart = (x_val) => {
+        if (x_val - config.c <= 0) return NaN; // Argument of log must be positive
+        return config.b * Math.log(x_val - config.c) + config.d_val;
+    };
+
+    // S(x) = 1 / (1 + e^(m*(x-x0)))
+    const switchFunc = (x_val) => 1 / (1 + Math.exp(config.m * (x_val - config.x0)));
+
+    // f(x) = S(x) * ExpPart(x) + (1 - S(x)) * LogPart(x)
+    const combinedFunc = (x_val) => {
+        const S_x = switchFunc(x_val);
+        const E_x = expPart(x_val);
+        const L_x = logPart(x_val);
+
+        if (isNaN(L_x)) { // If log part is undefined, behavior might need adjustment
+             // Depending on desired behavior:
+             // Option 1: If primarily in exp phase before log is defined, use exp.
+             if (x_val < config.x0 || S_x > 0.5) return E_x; // Heuristic
+             // Option 2: Return NaN to create a gap if log is essential for this x
+             return NaN;
+        }
+        return S_x * E_x + (1 - S_x) * L_x;
+    };
+
+    // --- Generate points ---
+    const points = [];
+    const step = (config.xMax - config.xMin) / (config.numPoints - 1);
+
+    for (let i = 0; i < config.numPoints; i++) {
+        const x = config.xMin + i * step;
+        const y = combinedFunc(x);
+        points.push({ x, y });
+    }
+
+    const validPoints = points.filter(p => !isNaN(p.y) && isFinite(p.y));
+
+    if (validPoints.length < 2) {
+        console.warn("Not enough valid points to draw a path. Adjust parameters (e.g., xMin > c).");
+        // Optionally draw a message on the SVG
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute("x", config.svgWidth / 2);
+        text.setAttribute("y", config.svgHeight / 2);
+        text.setAttribute("text-anchor", "middle");
+        text.setAttribute("fill", "red");
+        text.textContent = "Not enough data to plot. Check xMin > c.";
+        svgElement.appendChild(text);
+        return;
+    }
+
+    const yValues = validPoints.map(p => p.y);
+    let yMinPlot = Math.min(...yValues);
+    let yMaxPlot = Math.max(...yValues);
+
+    // Handle case where all y values are the same (flat line)
+    if (yMinPlot === yMaxPlot) {
+        yMinPlot -= 1; // Give some space
+        yMaxPlot += 1;
+    }
+    
+    const graphActualWidth = config.xMax - config.xMin;
+    const graphActualHeight = yMaxPlot - yMinPlot;
+
+    const drawableWidth = config.svgWidth - 2 * config.padding;
+    const drawableHeight = config.svgHeight - 2 * config.padding;
+
+    // --- Create SVG path string ---
+    let pathData = "";
+    let firstPointInSegment = true;
+
+    for (const p of points) { // Iterate original points to handle potential breaks due to NaN
+        if (isNaN(p.y) || !isFinite(p.y)) {
+            firstPointInSegment = true; // Reset for next potential segment
+            continue;
+        }
+
+        const graphX = p.x;
+        const graphY = p.y;
+
+        // Scale to SVG coordinates
+        const svgX = config.padding + ((graphX - config.xMin) / graphActualWidth) * drawableWidth;
+        
+        // SVG Y is inverted. (0,0) is top-left.
+        // If graphActualHeight is 0, map to middle of drawable height
+        const scaledY = graphActualHeight === 0 ? 0.5 : (graphY - yMinPlot) / graphActualHeight;
+        const svgY = (config.svgHeight - config.padding) - (scaledY * drawableHeight);
+
+        if (firstPointInSegment) {
+            pathData += `M${svgX.toFixed(2)},${svgY.toFixed(2)}`;
+            firstPointInSegment = false;
+        } else {
+            pathData += ` L${svgX.toFixed(2)},${svgY.toFixed(2)}`;
+        }
+    }
+
+    if (!pathData) {
+        console.warn("No path data generated.");
+        return;
+    }
+
+    // --- Create and append path element ---
+    const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    pathElement.setAttribute("d", pathData);
+    pathElement.setAttribute("stroke", config.strokeColor);
+    pathElement.setAttribute("stroke-width", config.strokeWidth);
+    pathElement.setAttribute("fill", "none");
+
+    svgElement.appendChild(pathElement);
+
+    // --- Optional: Draw Axes (Basic) ---
+    // X-axis
+    const xAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    xAxis.setAttribute("x1", config.padding);
+    xAxis.setAttribute("y1", config.svgHeight - config.padding);
+    xAxis.setAttribute("x2", config.svgWidth - config.padding);
+    xAxis.setAttribute("y2", config.svgHeight - config.padding);
+    xAxis.setAttribute("stroke", "black");
+    xAxis.setAttribute("stroke-width", 1);
+    svgElement.appendChild(xAxis);
+
+    // Y-axis
+    const yAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    yAxis.setAttribute("x1", config.padding);
+    yAxis.setAttribute("y1", config.padding);
+    yAxis.setAttribute("x2", config.padding);
+    yAxis.setAttribute("y2", config.svgHeight - config.padding);
+    yAxis.setAttribute("stroke", "black");
+    yAxis.setAttribute("stroke-width", 1);
+    svgElement.appendChild(yAxis);
+
+    // Add labels for axes (min/max values)
+    function addText(text, x, y, dominantBaseline = "middle", textAnchor = "middle", manualText, rotation) {
+        const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        label.setAttribute("x", x);
+        label.setAttribute("y", y);
+        label.setAttribute("dominant-baseline", dominantBaseline);
+        label.setAttribute("text-anchor", textAnchor);
+        label.setAttribute("font-size", "16px");
+        label.setAttribute("fill", "black");
+        label.textContent = manualText;
+        label.style.transform = `rotate(${rotation}deg)`;
+        svgElement.appendChild(label);
+    }
+    
+    // X-axis labels
+    addText(config.xMin.toFixed(1), 310, config.svgHeight - config.padding + 15, "top", "middle", "# of Creatures", 0);
+    //addText(config.xMax.toFixed(1), config.svgWidth - config.padding, config.svgHeight - config.padding + 15, "top", "middle");
+
+    // Y-axis labels
+    addText(yMinPlot.toFixed(1), -150, 40, "middle", "end", "Encounter Length", -90);
+    //addText(yMaxPlot.toFixed(1), config.padding - 10, config.padding, "middle", "end");
+
+}
+
+// --- UI Interaction ---
+function getOptionsFromUI() {
+    /*
+    return {
+        a: parseFloat(document.getElementById('param_a').value),
+        k: parseFloat(document.getElementById('param_k').value),
+        b: parseFloat(document.getElementById('param_b').value),
+        c: parseFloat(document.getElementById('param_c').value),
+        d_val: parseFloat(document.getElementById('param_d_val').value),
+        m: parseFloat(document.getElementById('param_m').value),
+        x0: parseFloat(document.getElementById('param_x0').value),
+        xMin: parseFloat(document.getElementById('param_xMin').value),
+        xMax: parseFloat(document.getElementById('param_xMax').value),
+        svgWidth: parseInt(document.getElementById('param_svgWidth').value),
+        svgHeight: parseInt(document.getElementById('param_svgHeight').value),
+        strokeColor: document.getElementById('param_strokeColor').value
+    };
+    */
+   return {
+        a: 1,
+        k: 0.5,
+        b: 5,
+        c: 2,
+        d_val: 10,
+        m: 1,
+        x0: 5,
+        xMin: 2.1,
+        xMax: 20,
+        svgWidth: 600,
+        svgHeight: 400,
+        strokeColor: "steelblue",
+    };
+}
+
+function updateGraph() {
+    const options = getOptionsFromUI();
+    if (options.xMin <= options.c) {
+        alert(`xMin (${options.xMin}) must be greater than c (${options.c}) for the logarithm to be defined. Please adjust.`);
+        // Highlight the c and xMin fields
+        //document.getElementById('param_xMin').style.borderColor = 'red';
+        //document.getElementById('param_c').style.borderColor = 'red';
+        return;
+    } else {
+        //document.getElementById('param_xMin').style.borderColor = '';
+        //document.getElementById('param_c').style.borderColor = '';
+    }
+    drawNonlinearGrowthSVG("nonlinear-svg", options);
+}
+
+// Initial draw when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+    updateGraph(); // Draw with default or UI-loaded values
+});
+
+</script>
+</html>

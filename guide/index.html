@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>General Guide - Pathplanner 2e</title>
+    <link rel="icon" href="/games/img/pathplanner_icon.png">
+    <link rel="stylesheet" href="../css/index.css">
+    <meta name="darkreader-lock">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="top-bar">
+        <div class="logo">Pathplanner 2e Help</div>
+        <nav>
+            <ul>
+                <li><a href="">Home</a></li>
+                <li><a href="campaign">Campaign Details</a></li>
+                <li><a href="sessions">Sessions</a></li>
+                <li><a href="party">Party Management</a></li>
+                <li><a href="homebrew">Homebrew Catalog</a></li>
+                <li><a href="creature-generator">Creature Generator</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main id="guide-container" class="container">
+        <h1>General Guide</h1>
+        <h2>Table of Contents</h2>
+        <ul>
+            <li><a class="table-contents-link" href="#welcome">Welcome</a></li>
+            <li><a class="table-contents-link" href="#getting-started">Getting Started</a></li>
+            <li><a class="table-contents-link" href="#campaign-details">Campaign Details</a></li>
+            <li><a class="table-contents-link" href="#session-planning">Session Planning/Notes</a></li>
+            <li><a class="table-contents-link" href="#party-management">Party Management</a></li>
+            <li><a class="table-contents-link" href="#homebrew-catalog">Homebrew Catalog</a></li>
+            <li><a class="table-contents-link" href="#creature-generator">Creature Generator</a></li>
+        </ul>
+        <h2 id="welcome">Welcome</h2>
+        <p>Welcome to the general guide for Pathplanner 2e! This tool allows you to quickly create, organize and plan you campaigns while enhancing the gameplay experience.</p>
+        <p>I'd like to thank you, dear user, for taking the time to read this guidance page. Many people don't take time out to learn how to use even the simplest of tools, and often end up frustratedly blaming the toolmaker.</p>
+        <h2 id="getting-started">Getting Started</h2>
+        <p>Pathplanner 2e will automatically put you through a short onboarding process of creating your first campaign if it detects this is the first time you've used this site in over a year on this device. You can also choose to import a campaign from a file, which will allow you to pick up where you left off from your last export.</p>
+        <h2 id="campaign-details">Campaign Details</h2>
+        <p>In the Campaign Details page, you can add or edit details such as the campaign name, description, genres, and suggested maturity rating. There is an additional text box for notes related to the campaign in general. It is recommended that you set a maturity rating for your campaign that you are willing to adhere to, so that your maturity rating matches the content of your campaign.</p>
+        <h2 id="session-planning">Session Planning/Notes</h2>
+        <p>The Sessions tab allows you to plan your sessions and make notes. You can create a new session, add details such as the session title, how many level-ups occurred during that session, and write notes related to the session. This feature is useful for keeping track of your campaign's progress and planning future sessions, as well as engineering encounters ahead of time.</p>
+        <h2 id="party-management">Party Management</h2>
+        <p>Pathplanner 2e also includes a Party Management feature, which allows you to create and manage your party's characters. You can add characters to your party, edit their attributes, and view their stats in a convenient format.</p>
+        <p>You can also import characters from Pathbuilder 2e using the built-in export features. Simply have your players share their character's Pathbuilder 2e JSON ID (Export Character > Export JSON file), paste it into the ID form, then click "Fetch Character Data".</p>
+        <h2 id="homebrew-catalog">Homebrew Catalog</h2>
+        <p>The Homebrew Catalog is a collection of user-created content that can be used in your campaigns. You can browse through the catalog, search for specific creatures or items, and add them to your campaign. To create a new homebrew asset, click on the "Homebrew" tab in the navigation header, or click "Homebrew" from the asset creation menu.</p>
+        <h2 id="creature-generator">Creature Generator</h2>
+        <p>The Creature Generator is a powerful tool that allows you to create custom creatures for your campaigns. You can adjust various attributes such as health, attack, and defense, and the generator will provide suggestions based on the level of the creature. Read more about how to use this advanced tool in the <a href="../creature-generator/guide">Creature Guide</a>.</p>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Pathplanner 2e. All rights reserved. This app is <a href="https://github.com/EvanderIV/pathplanner-2e" class="open-source-link" target="_blank">open source</a>.</p>
+    </footer>
+</body>
+<script>
+function drawNonlinearGrowthSVG(targetElementId, options = {}) {
+    const defaults = {
+        // SVG and Drawing parameters
+        svgWidth: 600,
+        svgHeight: 400,
+        padding: 50,    // Padding around the graph area
+        numPoints: 200, // Number of points to calculate for the curve
+        xMin: 2.1,      // Min x-value (ensure xMin > c for log)
+        xMax: 20,       // Max x-value
+        strokeColor: "steelblue",
+        strokeWidth: 2,
+
+        // Mathematical function parameters
+        a: 1,        // Exponential part: a * e^(kx)
+        k: 0.5,
+        b: 5,        // Logarithmic part: b * ln(x-c) + d_val
+        c: 2,
+        d_val: 10,
+        m: 1,        // Switching function: S(x) = 1 / (1 + e^(m*(x-x0)))
+        x0: 5        // Transition center
+    };
+
+    const config = { ...defaults, ...options };
+
+    const svgElement = document.getElementById(targetElementId);
+    if (!svgElement) {
+        console.error(`SVG element with id "${targetElementId}" not found.`);
+        return;
+    }
+
+    // Clear previous drawing
+    svgElement.innerHTML = '';
+
+    // Set SVG dimensions and viewBox
+    svgElement.setAttribute("width", config.svgWidth);
+    svgElement.setAttribute("height", config.svgHeight);
+    svgElement.setAttribute("viewBox", `0 0 ${config.svgWidth} ${config.svgHeight}`);
+
+    // --- Mathematical functions ---
+    // E(x) = a * e^(kx)
+    const expPart = (x_val) => config.a * Math.exp(config.k * x_val);
+
+    // L(x) = b * ln(x-c) + d_val
+    const logPart = (x_val) => {
+        if (x_val - config.c <= 0) return NaN; // Argument of log must be positive
+        return config.b * Math.log(x_val - config.c) + config.d_val;
+    };
+
+    // S(x) = 1 / (1 + e^(m*(x-x0)))
+    const switchFunc = (x_val) => 1 / (1 + Math.exp(config.m * (x_val - config.x0)));
+
+    // f(x) = S(x) * ExpPart(x) + (1 - S(x)) * LogPart(x)
+    const combinedFunc = (x_val) => {
+        const S_x = switchFunc(x_val);
+        const E_x = expPart(x_val);
+        const L_x = logPart(x_val);
+
+        if (isNaN(L_x)) { // If log part is undefined, behavior might need adjustment
+             // Depending on desired behavior:
+             // Option 1: If primarily in exp phase before log is defined, use exp.
+             if (x_val < config.x0 || S_x > 0.5) return E_x; // Heuristic
+             // Option 2: Return NaN to create a gap if log is essential for this x
+             return NaN;
+        }
+        return S_x * E_x + (1 - S_x) * L_x;
+    };
+
+    // --- Generate points ---
+    const points = [];
+    const step = (config.xMax - config.xMin) / (config.numPoints - 1);
+
+    for (let i = 0; i < config.numPoints; i++) {
+        const x = config.xMin + i * step;
+        const y = combinedFunc(x);
+        points.push({ x, y });
+    }
+
+    const validPoints = points.filter(p => !isNaN(p.y) && isFinite(p.y));
+
+    if (validPoints.length < 2) {
+        console.warn("Not enough valid points to draw a path. Adjust parameters (e.g., xMin > c).");
+        // Optionally draw a message on the SVG
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute("x", config.svgWidth / 2);
+        text.setAttribute("y", config.svgHeight / 2);
+        text.setAttribute("text-anchor", "middle");
+        text.setAttribute("fill", "red");
+        text.textContent = "Not enough data to plot. Check xMin > c.";
+        svgElement.appendChild(text);
+        return;
+    }
+
+    const yValues = validPoints.map(p => p.y);
+    let yMinPlot = Math.min(...yValues);
+    let yMaxPlot = Math.max(...yValues);
+
+    // Handle case where all y values are the same (flat line)
+    if (yMinPlot === yMaxPlot) {
+        yMinPlot -= 1; // Give some space
+        yMaxPlot += 1;
+    }
+    
+    const graphActualWidth = config.xMax - config.xMin;
+    const graphActualHeight = yMaxPlot - yMinPlot;
+
+    const drawableWidth = config.svgWidth - 2 * config.padding;
+    const drawableHeight = config.svgHeight - 2 * config.padding;
+
+    // --- Create SVG path string ---
+    let pathData = "";
+    let firstPointInSegment = true;
+
+    for (const p of points) { // Iterate original points to handle potential breaks due to NaN
+        if (isNaN(p.y) || !isFinite(p.y)) {
+            firstPointInSegment = true; // Reset for next potential segment
+            continue;
+        }
+
+        const graphX = p.x;
+        const graphY = p.y;
+
+        // Scale to SVG coordinates
+        const svgX = config.padding + ((graphX - config.xMin) / graphActualWidth) * drawableWidth;
+        
+        // SVG Y is inverted. (0,0) is top-left.
+        // If graphActualHeight is 0, map to middle of drawable height
+        const scaledY = graphActualHeight === 0 ? 0.5 : (graphY - yMinPlot) / graphActualHeight;
+        const svgY = (config.svgHeight - config.padding) - (scaledY * drawableHeight);
+
+        if (firstPointInSegment) {
+            pathData += `M${svgX.toFixed(2)},${svgY.toFixed(2)}`;
+            firstPointInSegment = false;
+        } else {
+            pathData += ` L${svgX.toFixed(2)},${svgY.toFixed(2)}`;
+        }
+    }
+
+    if (!pathData) {
+        console.warn("No path data generated.");
+        return;
+    }
+
+    // --- Create and append path element ---
+    const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    pathElement.setAttribute("d", pathData);
+    pathElement.setAttribute("stroke", config.strokeColor);
+    pathElement.setAttribute("stroke-width", config.strokeWidth);
+    pathElement.setAttribute("fill", "none");
+
+    svgElement.appendChild(pathElement);
+
+    // --- Optional: Draw Axes (Basic) ---
+    // X-axis
+    const xAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    xAxis.setAttribute("x1", config.padding);
+    xAxis.setAttribute("y1", config.svgHeight - config.padding);
+    xAxis.setAttribute("x2", config.svgWidth - config.padding);
+    xAxis.setAttribute("y2", config.svgHeight - config.padding);
+    xAxis.setAttribute("stroke", "black");
+    xAxis.setAttribute("stroke-width", 1);
+    svgElement.appendChild(xAxis);
+
+    // Y-axis
+    const yAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    yAxis.setAttribute("x1", config.padding);
+    yAxis.setAttribute("y1", config.padding);
+    yAxis.setAttribute("x2", config.padding);
+    yAxis.setAttribute("y2", config.svgHeight - config.padding);
+    yAxis.setAttribute("stroke", "black");
+    yAxis.setAttribute("stroke-width", 1);
+    svgElement.appendChild(yAxis);
+
+    // Add labels for axes (min/max values)
+    function addText(text, x, y, dominantBaseline = "middle", textAnchor = "middle", manualText, rotation) {
+        const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        label.setAttribute("x", x);
+        label.setAttribute("y", y);
+        label.setAttribute("dominant-baseline", dominantBaseline);
+        label.setAttribute("text-anchor", textAnchor);
+        label.setAttribute("font-size", "16px");
+        label.setAttribute("fill", "black");
+        label.textContent = manualText;
+        label.style.transform = `rotate(${rotation}deg)`;
+        svgElement.appendChild(label);
+    }
+    
+    // X-axis labels
+    addText(config.xMin.toFixed(1), 310, config.svgHeight - config.padding + 15, "top", "middle", "# of Creatures", 0);
+    //addText(config.xMax.toFixed(1), config.svgWidth - config.padding, config.svgHeight - config.padding + 15, "top", "middle");
+
+    // Y-axis labels
+    addText(yMinPlot.toFixed(1), -150, 40, "middle", "end", "Encounter Length", -90);
+    //addText(yMaxPlot.toFixed(1), config.padding - 10, config.padding, "middle", "end");
+
+}
+
+// --- UI Interaction ---
+function getOptionsFromUI() {
+    /*
+    return {
+        a: parseFloat(document.getElementById('param_a').value),
+        k: parseFloat(document.getElementById('param_k').value),
+        b: parseFloat(document.getElementById('param_b').value),
+        c: parseFloat(document.getElementById('param_c').value),
+        d_val: parseFloat(document.getElementById('param_d_val').value),
+        m: parseFloat(document.getElementById('param_m').value),
+        x0: parseFloat(document.getElementById('param_x0').value),
+        xMin: parseFloat(document.getElementById('param_xMin').value),
+        xMax: parseFloat(document.getElementById('param_xMax').value),
+        svgWidth: parseInt(document.getElementById('param_svgWidth').value),
+        svgHeight: parseInt(document.getElementById('param_svgHeight').value),
+        strokeColor: document.getElementById('param_strokeColor').value
+    };
+    */
+   return {
+        a: 1,
+        k: 0.5,
+        b: 5,
+        c: 2,
+        d_val: 10,
+        m: 1,
+        x0: 5,
+        xMin: 2.1,
+        xMax: 20,
+        svgWidth: 600,
+        svgHeight: 400,
+        strokeColor: "steelblue",
+    };
+}
+
+function updateGraph() {
+    const options = getOptionsFromUI();
+    if (options.xMin <= options.c) {
+        alert(`xMin (${options.xMin}) must be greater than c (${options.c}) for the logarithm to be defined. Please adjust.`);
+        // Highlight the c and xMin fields
+        //document.getElementById('param_xMin').style.borderColor = 'red';
+        //document.getElementById('param_c').style.borderColor = 'red';
+        return;
+    } else {
+        //document.getElementById('param_xMin').style.borderColor = '';
+        //document.getElementById('param_c').style.borderColor = '';
+    }
+    drawNonlinearGrowthSVG("nonlinear-svg", options);
+}
+
+// Initial draw when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+    updateGraph(); // Draw with default or UI-loaded values
+});
+
+</script>
+</html>

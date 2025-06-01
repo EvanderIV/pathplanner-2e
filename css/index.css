@@ -29,6 +29,10 @@ body::before {
     background-color: #f5e8c7; /* Base parchment */
 }
 
+.open-source-link {
+    color: #3a8ec2; /* Light blue text */
+}
+
 
 .top-bar {
     background-color: #5c4033; /* Dark wood brown */
@@ -73,7 +77,7 @@ body::before {
 }
 
 .top-bar nav ul li a.active {
-    font-weight: bold;
+    /*font-weight: bold;*/
     text-decoration: underline;
     text-decoration-thickness: 2px;
     text-underline-offset: 4px;
@@ -114,6 +118,7 @@ h1 {
 }
 
 input[type="text"],
+input[type="number"],
 textarea,
 select {
     width: 100%;
@@ -129,6 +134,7 @@ select {
 }
 
 input[type="text"]:focus,
+input[type="number"]:focus,
 textarea:focus,
 select:focus {
     border-color: #8a5a2c; /* Darker focus border */
@@ -340,17 +346,9 @@ footer {
     font-size: 0.85em;
 }
 
-/* Remove the old party-member-actions specific styling if it's no longer used elsewhere */
-/* .party-member-actions { (delete or comment out if this class is now fully removed from HTML)
-    padding: 10px 15px;
-    text-align: right;
-    border-top: 1px solid #e0cba8;
-} */
-
-.btn-delete-member { /* Keep or adjust specific delete button styling */
+.btn-delete-member { 
     background-color: #a0522d;
     color: white;
-    /* margin-left: 10px; Removed as gap is used now */
 }
 .btn-delete-member:hover {
     background-color: #80381a;
@@ -359,25 +357,22 @@ footer {
 
 
 .party-member-card {
-    /* UI Isolation: Lighter background and distinct border */
-    background-color: #fdfaf3; /* A lighter, slightly creamy off-white, distinct from container */
-    border: 1px solid #c8a064; /* A clear, darker tan border */
-    /* border-left: 5px solid #8a5a2c; /* This was from home page list, remove if not desired here */
+    background-color: #fdfaf3; 
+    border: 1px solid #c8a064; 
     border-radius: 6px;
     margin-bottom: 15px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .party-member-header {
-    /* Keep header styling, maybe slightly adjust if needed due to new card background */
-    background-color: rgba(239, 220, 187, 0.6); /* Slightly adjusted for contrast if needed */
+    background-color: #D1C0A8; 
     padding: 10px 15px;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #e0cba8; /* Lighter border for header if card border is strong */
-    border-top-left-radius: 5px;     /* Match card's border-radius */
+    border-bottom: 1px solid #e0cba8; 
+    border-top-left-radius: 5px;    
     border-top-right-radius: 5px;
 }
 
@@ -389,22 +384,23 @@ footer {
 
 .party-member-header .expand-icon {
     font-weight: bold;
-    transition: transform 0.3s ease;
+    font-size: 1.2em;
+    transition: transform 0.35s ease;
+    margin-left: 10px;
 }
 
-.party-member-card.expanded .party-member-header .expand-icon {
+.party-member-card.expanded .expand-icon {
     transform: rotate(90deg);
 }
 
 
 
 .party-member-card.expanded .party-member-details {
-    max-height: 1500px; /* Increased significantly to ensure content fits. Adjust if necessary. */
-    padding-top: 10px;    /* Apply vertical padding when expanded */
-    padding-bottom: 15px; /* Slightly more padding at the bottom when expanded for button spacing */
+    max-height: 1500px; 
+    padding-top: 10px;   
+    padding-bottom: 15px; 
 }
 
-/* Rest of the compact UI styles for labels, inputs etc. remain the same */
 .party-member-details .form-group {
     margin-bottom: 0;
 }
@@ -462,6 +458,7 @@ footer {
 /* Styles for Creature Generator Page */
 .creature-form-layout {
     display: flex;
+    flex-direction: row;
     gap: 20px;
 }
 
@@ -471,19 +468,14 @@ footer {
 
 #suggestionsPanel {
     flex: 1; /* Suggestions panel takes less space */
-    background-color: rgba(239, 220, 187, 0.6); /* Slightly different background */
+    background-color: #D1C0A8; /* Slightly different background */
     padding: 15px;
     border-radius: 6px;
     border: 1px solid #d2b48c;
     
-    /* --- Sticky Positioning --- */
     position: sticky;
-    top: 80px; /* Adjust this value based on your top-bar's height + desired margin */
-    /* --- End Sticky Positioning --- */
-    
-    /* height: fit-content; */ /* May not be needed with max-height, or can cause issues with sticky if content is very short. Test this. */
-    max-height: calc(100vh - 100px); /* Adjust max-height to ensure it doesn't overlap footer if sticky */
-                                   /* (100px = 80px top offset + 20px bottom margin/padding) */
+    top: 80px; 
+    max-height: calc(100vh - 100px); 
     overflow-y: auto;
 }
 
@@ -524,10 +516,6 @@ footer {
     font-size: 1.2em;
 }
 
-.form-group { /* Reusing existing, ensure it works well */
-    margin-bottom: 1rem; /* Ensure spacing */
-}
-
 .custom-stat-input {
     margin-left: 10px;
     width: auto; /* Allow it to be smaller */
@@ -553,13 +541,98 @@ footer {
     margin-left: 5px; /* Indent magical stats slightly */
 }
 
+/* Diagnostics Panel Styles */
+#diagnosticsPanel {
+    background-color: rgba(224, 214, 196, 0.7); /* Slightly different, distinct background with some transparency */
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #c8a064; /* Consistent with other panel borders */
+    margin-top: 20px; 
+    margin-bottom: 20px; 
+    display: flex;
+    gap: 15px;
+    min-height: 160px;
+    position: sticky;
+    bottom: 30px; /* Adjust so it's above the save button area */
+    z-index: 900; /* Below modals but above general content */
+}
+
+.diagnostics-column {
+    padding: 5px;
+}
+
+.diagnostics-graph-area {
+    flex: 1; /* Takes 1/3 of the space */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 150px; /* Ensure some minimum width for the graph */
+}
+
+.diagnostics-info-area {
+    flex: 2; /* Takes 2/3 of the space */
+    font-size: 0.9em;
+    color: #4a3b31;
+}
+.diagnostics-info-area h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #5c4033; /* Dark wood brown */
+    font-family: 'Merriweather', serif;
+}
+.diagnostics-info-area p {
+    margin: 0;
+}
+.diagnostics-info-area span {
+    font-weight: bold;
+    color: #3a2410; /* Darker brown for values */
+}
+
+
+#diagnosticsHexagonSVG {
+    width: 100%;
+    max-width: 150px; /* Max size of the SVG element */
+    height: auto;    /* Maintain aspect ratio */
+}
+
+.hexagon-background {
+    fill: rgba(240, 230, 209, 0.7); /* Lighter parchment shade for hex background */
+    stroke: #8a5a2c; /* Wood-like border */
+    stroke-width: 1.5; /* Slightly thicker for visual presence */
+}
+
+.stats-triangle-shape {
+    fill: rgba(92, 64, 51, 0.55); /* Semi-transparent dark fill for the triangle */
+    stroke: #3E2E24; /* Darker border for triangle */
+    stroke-width: 1;
+    transition: points 0.3s ease-in-out; /* Smooth transition for points change */
+}
+
+.diag-label {
+    font-family: 'Merriweather', serif;
+    font-size: 10px; /* Adjusted for visibility within SVG */
+    fill: #5c4033;
+    z-index: 1000; /* Ensure labels are above the triangle */
+}
+
+
 /* Responsive adjustments if needed */
-@media (max-width: 900px) { /* Existing 900px media query from creature generator, will add new rules to it or create new one if context implies it*/
+@media (max-width: 900px) { 
     .creature-form-layout {
         flex-direction: column;
     }
     #creatureForm, #suggestionsPanel {
         flex: none;
+    }
+    #diagnosticsPanel {
+        flex-direction: column; /* Stack graph and info vertically on smaller screens */
+        align-items: center; /* Center items when stacked */
+    }
+    .diagnostics-graph-area {
+        margin-bottom: 15px;
+    }
+    .diagnostics-info-area {
+        text-align: center; /* Center text when stacked */
     }
 }
 
@@ -569,32 +642,31 @@ footer {
 .catalog-controls-bar {
     display: flex;
     justify-content: flex-start; 
-    align-items: center; /* Vertically align items in the middle if they have different heights */
+    align-items: center; 
     flex-wrap: wrap; 
     gap: 15px; 
     margin-bottom: 20px; 
-    padding-bottom: 10px; /* Reduced padding below the controls bar */
+    padding-bottom: 10px; 
     border-bottom: 1px solid #d2b48c;
 }
 
-/* Custom Dropdown for Add Asset Button */
 .add-asset-container {
-    position: relative; /* For positioning the dropdown */
-    display: inline-block; /* Allow other elements next to it if needed */
-    margin-bottom: 0; /* Remove default margin if any, rely on gap */
+    position: relative; 
+    display: inline-block; 
+    margin-bottom: 0; 
 }
 
 .custom-dropdown-menu {
-    display: none; /* Hidden by default */
+    display: none; 
     position: absolute;
-    top: 100%; /* Position below the button */
+    top: 100%; 
     left: 0;
-    background-color: #fdfaf3; /* Light background like cards */
+    background-color: #fdfaf3; 
     border: 1px solid #c8a064;
-    border-radius: 0 0 6px 6px; /* Rounded bottom corners */
+    border-radius: 0 0 6px 6px; 
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-    z-index: 100; /* Ensure it's above other content */
-    min-width: 200px; /* Or width of the button */
+    z-index: 100; 
+    min-width: 200px; 
 }
 
 .custom-dropdown-menu a {
@@ -602,82 +674,80 @@ footer {
     padding: 10px 15px;
     color: #5c4033;
     text-decoration: none;
-    border-bottom: 1px solid #e0cba8; /* Separator */
+    border-bottom: 1px solid #e0cba8; 
 }
 .custom-dropdown-menu a:last-child {
     border-bottom: none;
 }
 .custom-dropdown-menu a:hover {
-    background-color: rgba(239, 220, 187, 0.6); /* Hover effect */
+    background-color: #D1C0A8; 
 }
 
 .sort-controls {
     display: flex;
     align-items: center;
-    gap: 8px; /* Reduced gap */
+    gap: 8px; 
 }
 .sort-controls label {
     font-weight: bold;
     color: #5c4033;
-    font-size: 0.9em; /* Slightly smaller label */
-    margin-bottom: 0; /* Remove margin if any */
+    font-size: 0.9em; 
+    margin-bottom: 0; 
     width: 5.8em;
 }
 .sort-controls select {
-    padding: 0.3rem 0.5rem; /* Reduced padding */
-    font-size: 0.9em; /* Slightly smaller font in select */
+    padding: 0.3rem 0.5rem; 
+    font-size: 0.9em; 
     border-radius: 4px;
     border: 1px solid #b08d57;
     background-color: #fffaf0;
 }
-.sort-controls .btn-small { /* For reverse button */
-    padding: 0.3rem 0.5rem; /* Make reverse button padding consistent with select */
-    font-size: 0.9em; /* Ensure font size matches select for alignment */
-    line-height: 1.2; /* Adjust line height for better vertical alignment if needed */
+.sort-controls .btn-small { 
+    padding: 0.3rem 0.5rem; 
+    font-size: 0.9em; 
+    line-height: 1.2; 
 }
 
-/* Styles for the filter panel in its top position */
 .filter-panel-top {
-    background-color: transparent; /* Make less visually heavy, or very light */
-    padding: 5px 10px; /* Reduced padding */
+    background-color: transparent; 
+    padding: 5px 10px; 
     border-radius: 6px;
-    border: 1px solid #d2b48c; /* Keep border for grouping or make it lighter */
-    /* border: 1px solid #e0cba8; */ /* Example of a lighter border */
+    border: 1px solid #d2b48c; 
 }
 
 .filter-panel-top h2 {
     margin-top: 0;
-    margin-bottom: 5px; /* Reduced margin */
+    margin-bottom: 5px; 
     font-family: 'Merriweather', serif;
     color: #5c4033;
-    font-size: 0.95em; /* Smaller title */
-    border-bottom: none; /* Remove border for compactness, or make it very light */
+    font-size: 0.95em; 
+    border-bottom: none; 
     padding-bottom: 0;
-    display: inline-block; /* Allow options to flow next to it if space allows */
-    margin-right: 10px; /* Space between title and first option */
+    display: inline-block; 
+    margin-right: 10px; 
 }
 
 .filter-panel-top .filter-options-container {
-    display: flex; /* Arrange filter groups horizontally */
-    gap: 10px;     /* Reduced gap */
+    display: flex; 
+    gap: 10px;     
     flex-wrap: wrap;
-    align-items: center; /* Align checkboxes and labels */
+    align-items: center; 
 }
 
 .filter-panel-top .filter-group {
     margin-bottom: 0; 
-    display: flex; /* Align checkbox and label nicely */
+    display: flex; 
     align-items: center;
 }
 .filter-panel-top .filter-group label {
-    margin-left: 3px; /* Reduced margin */
+    margin-left: 3px; 
     color: #4a3b31;
-    font-size: 0.85em; /* Smaller label text */
+    font-size: 0.85em; 
 }
 .filter-panel-top .filter-group input[type="checkbox"] {
     vertical-align: middle;
-    margin: 0; /* Remove default checkbox margins */
-    transform: scale(0.9); /* Slightly smaller checkbox */
+    margin: 0; 
+    transform: scale(0.9); 
 }
 
 
@@ -687,16 +757,6 @@ footer {
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
     align-items: start; 
-}
-
-.homebrew-asset-card {
-    background-color: #fdfaf3; 
-    border: 1px solid #eDeCe6; 
-    border-radius: 6px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 20px;
 }
 
 .homebrew-asset-header {
@@ -719,11 +779,13 @@ footer {
 }
 
 .homebrew-asset-header .asset-type-badge {
+    width: fit-content;
+    height: fit-content;
     font-size: 0.8em;
     padding: 3px 8px;
     border-radius: 10px;
-    background-color: #7a6252; 
-    color: #fdfaf3; 
+    background-color: #7a6252;
+    color: #fdfaf3;
 }
 
 .homebrew-asset-content {
@@ -762,56 +824,41 @@ footer {
     padding-top: 10px;
 }
 
+
 .homebrew-asset-card {
-    background-color: #fdfaf3;
-    border: 1px solid #c8a064;
+    background-color: #fdfaf3; 
+    border: 1px solid #eDeCe6; 
     border-radius: 6px;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.12); 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
     display: flex;
     flex-direction: column;
-    margin-bottom: 20px; 
+    margin-bottom: 20px;
+}
+
+.homebrew-asset-subdiv {
+    display: flex;
+    flex-direction: row;
+}
+
+.homebrew-asset-subdiv div {
+    margin: 0;
+    text-align: center;
 }
 
 .homebrew-asset-header .expand-icon {
     font-weight: bold;
     font-size: 1.2em;
-    transition: transform 0.3s ease; 
+    transition: transform 0.35s ease;
     margin-left: 10px;
 }
 
-.homebrew-asset-card.expanded .homebrew-asset-header .expand-icon {
+.homebrew-asset-card.expanded .expand-icon {
     transform: rotate(90deg);
 }
 
-.homebrew-asset-content { 
-    padding-left: 15px;  
-    padding-right: 15px;
-    padding-top: 0;      
-    padding-bottom: 0;
-    max-height: 0;       
-    overflow: hidden;
-    transition: max-height 0.35s ease-out, 
-                padding-top 0.35s ease-out, 
-                padding-bottom 0.35s ease-out;
-}
-
-.homebrew-asset-card.expanded .homebrew-asset-content {
-    max-height: 2000px; 
-    padding-top: 10px;    
-    padding-bottom: 15px; 
-}
 
 .creature-full-details {
     font-size: 0.9em;
-}
-.creature-full-details p {
-    margin: 4px 0;
-    line-height: 1.5;
-}
-.creature-full-details strong {
-    color: #5c4033;
-    display: inline-block;
-    min-width: 120px; 
 }
 .creature-full-details .notes-section {
     margin-top: 10px;
@@ -878,27 +925,20 @@ footer {
 
 /* Responsive adjustments for controls and layout */
 @media (max-width: 900px) {
-    .creature-form-layout { /* This was existing for 900px */
-        flex-direction: column;
-    }
-    #creatureForm, #suggestionsPanel { /* This was existing for 900px */
-        flex: none;
-    }
-
     .catalog-controls-bar {
         flex-direction: column;
         align-items: stretch; 
     }
     .filter-panel-top {
-        margin-top: 10px; /* Add some space when it stacks */
+        margin-top: 10px; 
     }
     .filter-panel-top h2 {
-        display: block; /* Stack title above options on smaller screens */
+        display: block; 
         margin-bottom: 8px;
     }
     .filter-panel-top .filter-options-container {
-        flex-direction: row; /* Keep options in a row to wrap, or column if preferred */
-        align-items: flex-start; /* Align to start if they wrap */
+        flex-direction: row; 
+        align-items: flex-start; 
     }
 }
 
@@ -934,7 +974,7 @@ footer {
     /* Catalog specific adjustments for 768px */
     .catalog-controls-bar {
         flex-direction: column;
-        align-items: flex-start; /* This will override the 900px 'stretch' for smaller screens */
+        align-items: flex-start; 
     }
     .catalog-main-layout {
         flex-direction: column;
@@ -942,10 +982,228 @@ footer {
     .filter-panel {
         width: 100%;
         margin-top: 20px;
-        position: static; /* Disable sticky on small screens if it causes issues */
+        position: static; 
         max-height: none;
     }
     .homebrew-assets-columns {
-        flex-direction: column; /* Stack columns vertically on very small screens, or just let content wrap */
+        flex-direction: column; 
     }
+}
+
+
+/* Session Notes Page Styles */
+.sessions-area {
+    margin-bottom: 20px;
+}
+
+.session-card {
+    background-color: #fdfaf3; 
+    border: 1px solid #eDeCe6; 
+    border-radius: 6px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.session-header {
+    background-color: #D1C0A8; 
+    padding: 10px 15px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #b0a08c;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.session-header h3 { 
+    margin: 0;
+    font-family: 'Merriweather', serif;
+    color: #4a3b31;
+    flex-grow: 1; 
+}
+.session-header input[type="text"] { 
+    font-family: 'Merriweather', serif;
+    color: #4a3b31;
+    font-size: 1.2em; 
+    font-weight: bold;
+    border: none;
+    background: transparent;
+    padding: 0;
+    flex-grow: 1;
+    margin-right: 10px;
+}
+.session-header input[type="text"]:focus {
+    box-shadow: none;
+    border-bottom: 1px dashed #4a3b31; 
+}
+
+
+.session-header .level-up-group {
+    display: flex;
+    align-items: center;
+    margin-left: 15px; 
+}
+.session-header .level-up-group label {
+    font-size: 0.9em;
+    color: #4a3b31;
+    margin-right: 5px;
+    margin-bottom: 0; 
+    font-family: 'Lato', sans-serif;
+}
+.session-header .level-up-group input[type="number"] {
+    width: 60px; 
+    padding: 0.3rem 0.5rem;
+    font-size: 0.9em;
+    margin-right: 10px; 
+}
+
+
+.session-header .expand-icon {
+    font-weight: bold;
+    font-size: 1.2em;
+    color: #4a3b31;
+    transition: transform 0.35s ease;
+}
+
+.session-card.expanded .session-header .expand-icon {
+    transform: rotate(90deg);
+}
+
+.session-details {
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 0;
+    padding-bottom: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease-out, 
+                padding-top 0.35s ease-out, 
+                padding-bottom 0.35s ease-out;
+}
+
+.session-card.expanded .session-details {
+    max-height: 1500px; 
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.session-details textarea { 
+    width: 100%;
+    min-height: 150px; 
+    padding: 0.6rem 0.8rem;
+    font-size: 0.95em;
+}
+
+.session-actions { 
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 10px; 
+}
+.session-actions .btn-delete-session {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.9em;
+}
+
+.btn-add-new { 
+    display: block;
+    margin: 20px auto; 
+}
+
+.json-output-area {
+    background-color: #f0f0f0; 
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-top: 15px;
+    max-height: 300px; 
+    overflow-y: auto;
+    white-space: pre-wrap; 
+    word-break: break-all; 
+    font-family: monospace; 
+    font-size: 0.85em;
+    text-align: left; 
+}
+
+
+
+
+
+
+
+#warningBox {
+    background-color: #fff0f0; /* Light reddish background for warnings */
+    border: 1px solid #dcc0c0;
+    border-left: 5px solid #c0392b; /* Stronger left border for emphasis */
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin-bottom: 15px; /* Space between warning box and suggestions panel */
+    position: sticky;
+    bottom: 280px; /* Adjust based on top-bar height + desired gap, should be less than suggestionsPanel.top if suggestions is also sticky below it */
+    z-index: 950; /* Ensure it's above form elements but potentially below modals */
+}
+#warningBox h4 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    color: #a94442; /* Dark red for warning title */
+    font-family: 'Merriweather', serif;
+    font-size: 1.1em;
+    display: flex;
+    align-items: center;
+}
+.warning-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+}
+#warningBox ul {
+    list-style-type: disc; /* Or 'none' if prefixing with icons */
+    padding-left: 20px;
+    margin-bottom: 0;
+    font-size: 0.9em;
+    color: #5c4033;
+}
+#warningBox li {
+    margin-bottom: 5px;
+}
+
+
+
+.table-contents-link {
+    color: #3a8ec2; /* Light blue text for links */
+    text-decoration: none;
+    font-weight: bold;
+}
+
+code {
+    background-color: rgba(167, 158, 135, 0.3); /* Light parchment background for code */
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-family: 'Courier New', Courier, monospace; /* Monospace font for code */
+    font-size: 0.9em;
+    color: #3a2410; /* Dark brown text for code */
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px; /* Space between buttons */
+    margin-top: 20px; /* Space above the buttons */
+    align-items: center; /* Align items if they have different heights */
+}
+
+hr {
+    border-color:rgba(92, 64, 51, 0.55);
+    border-width: 1px;
+}
+
+h3 {
+    margin-bottom: -1rem; /* Reduced margin for tighter spacing */
+}
+
+h4 {
+    margin-bottom: -1rem; /* Reduced margin for tighter spacing */
+}
+
+#guide-container h2 {
+    margin-top: 2rem !important;
+    margin-bottom: 0;
 }
