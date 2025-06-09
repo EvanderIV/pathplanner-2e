@@ -2,16 +2,16 @@ if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').match
     document.body.classList.add('darkmode');
     document.getElementById("dark-mode-toggle").checked = true;
 }
-else if (document.cookies.contains("darkmode=true")) {
+else if (document.cookie.includes("darkmode=true")) {
     document.body.classList.add('darkmode');
     document.getElementById("dark-mode-toggle").checked = true;
 }
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
     const newColorScheme = event.matches ? "dark" : "light";
-    if (newColorScheme === "dark" && !document.cookies.contains("darkmode=false")) {
+    if (newColorScheme === "dark" && !document.cookie.includes("darkmode=false")) {
         document.body.classList.add('darkmode');
         document.getElementById("dark-mode-toggle").checked = true;
-    } else if (!document.cookies.contains("darkmode=true")) {
+    } else if (!document.cookie.includes("darkmode=true")) {
         document.body.classList.remove('darkmode');
         document.getElementById("dark-mode-toggle").checked = false;
     }

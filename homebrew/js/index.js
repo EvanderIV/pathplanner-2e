@@ -301,7 +301,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const asset = getCookie(`${prefix}${campaignName}_${id}`);
             if (asset) {
                 asset.assetType = asset.assetType || type;
-                asset.isExpanded = asset.isExpanded || false; // Preserve expanded state from cookie
+                asset.isExpanded = false;
+                //asset.isExpanded = asset.isExpanded || false; // Preserve expanded state from cookie
                 asset.createdAt = asset.createdAt || Date.now();
                 combinedAssets.push(asset);
             } else {

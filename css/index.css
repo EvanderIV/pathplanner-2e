@@ -1,6 +1,4 @@
 
-
-
 body {
     font-family: 'Lato', sans-serif;
     margin: 0;
@@ -33,6 +31,26 @@ body::before {
 }
 
 
+.campaign-item {
+    background-color: #ffecc0; /* Light parchment color */
+    border: 1px solid #d2b48c; /* Tan border */
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-right: 2.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.campaign-item:hover {
+    background-color: #ffe7ae; /* Slightly darker on hover */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.campaign-item::marker {
+    color: #5c403300; /* Dark wood brown for list markers */
+}
 
 .open-source-link {
     color: #3a8ec2; /* Light blue text */
@@ -1419,7 +1437,9 @@ body.darkmode #diagnosticsPanel {
     background-color: rgba(12, 19, 23, 0.85);
 }
 
-body.darkmode .diagnostics-info-area h4,p,span {
+body.darkmode .diagnostics-info-area h4,
+body.darkmode .diagnostics-info-area p,
+body.darkmode .diagnostics-info-area span {
     color: #f5e8c7 !important;
 }
 
@@ -1443,11 +1463,19 @@ body.darkmode aside#suggestionsPanel {
     background-color: rgba(12, 19, 23, 0.85) !important;
 }
 
-body.darkmode aside#suggestionsPanel h1,h2,h3,h4,p,span,strong {
+body.darkmode aside#suggestionsPanel h1,
+body.darkmode aside#suggestionsPanel h2,
+body.darkmode aside#suggestionsPanel h3,
+body.darkmode aside#suggestionsPanel h4,
+body.darkmode aside#suggestionsPanel p,
+body.darkmode aside#suggestionsPanel span,
+body.darkmode aside#suggestionsPanel strong {
     color: #f5e8c7 !important;
 }
 
-body.darkmode .form-group input,select,textarea {
+body.darkmode .form-group input,
+body.darkmode .form-group select,
+body.darkmode .form-group textarea {
     background-color: rgba(12, 19, 23, 0.85) !important;
     color: #f5e8c7 !important;
 }
@@ -1474,7 +1502,9 @@ body.darkmode .session-header {
     background-color: #2c4a6f; /* Darker blue for asset header */
 }
 
-body.darkmode .session-header label,input {
+body.darkmode .session-header label,
+body.darkmode .session-header input,
+body.darkmode .session-header span {
     color: #f5e8c7 !important;
 }
 
@@ -1494,6 +1524,23 @@ body.darkmode .sort-controls label {
 
 body.darkmode .filter-group label {
     color: #f5e8c7 !important;
+}
+
+body.darkmode .campaign-item {
+    background-color: #0d1b28; /* Light parchment color */
+    border: 1px solid #d2b48c; /* Tan border */
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-right: 2.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+body.darkmode .campaign-item:hover {
+    background-color: #051729; /* Slightly darker on hover */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 body.monospace {
