@@ -79,9 +79,9 @@ body::before {
     flex-direction: column;
     align-items: center;
     position: absolute;
-    height: 50em;
+    height: 20em;
     width: 25em;
-    top: -44em;
+    top: -14em;
     left: 0;
     transition: top 0.3s ease;
     z-index: 9999;

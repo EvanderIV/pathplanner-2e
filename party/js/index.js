@@ -261,7 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 memberObject.isExpanded = !memberObject.isExpanded;
                 cardElement.classList.toggle('expanded');
-                expandIcon.textContent = memberObject.isExpanded ? '▼' : '►';
+                //expandIcon.textContent = memberObject.isExpanded ? '▼' : '►';
             });
         }
     };
