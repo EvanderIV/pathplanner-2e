@@ -10,8 +10,41 @@
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div id="settings">
+        <div class="settings-header">
+            <p>Settings</p>
+        </div>
+        <div class="settings-item">
+            <label class="toggle">
+                <input type="checkbox" id="dark-mode-toggle" name="btnToggle" />
+                <span id="dark-mode-slider" class="slider"></span>
+            </label>
+            <p>Dark Mode</p>
+        </div>
+        <div class="settings-item">
+            <label class="toggle">
+                <input type="checkbox" id="monospace-toggle" name="btnToggle" />
+                <span id="monospace-slider" class="slider"></span>
+            </label>
+            <p>Monospace Fonts</p>
+        </div>
+        <div class="settings-item">
+            <label class="toggle">
+                <input type="checkbox" id="contrast-toggle" name="btnToggle" />
+                <span id="contrast-slider" class="slider"></span>
+            </label>
+            <p>High Contrast</p>
+        </div>
+        <div class="settings-item">
+            <label class="toggle">
+                <input type="checkbox" id="nomotion-toggle" name="btnToggle" />
+                <span id="nomotion-slider" class="slider"></span>
+            </label>
+            <p>Reduced Motion</p>
+        </div>
+    </div>
     <header class="top-bar">
-        <div class="logo">Pathplanner 2e</div>
+        <div id="logo"><p id="hamburger">&equiv;</p><p>Pathplanner 2e</p></div>
         <nav>
             <ul>
                 <li><a href="../">Home</a></li>
@@ -239,4 +272,5 @@
 
     <script src="js/index.js"></script>
 </body>
+<script src="../js/controllers.js"></script>
 </html>

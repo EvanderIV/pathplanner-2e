@@ -104,6 +104,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (campaignDataString) {
             try {
                 currentCampaignFullData = JSON.parse(campaignDataString);
+
+                if (!currentCampaignFullData.homebrewAssets) {
+                    currentCampaignFullData.homebrewAssets = { creatures: [], items: [], spells: [] };
+                }
                 if (!currentCampaignFullData.sessions) {
                     currentCampaignFullData.sessions = [];
                 }
@@ -173,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="session-header">
                     <input type="text" class="session-title-input" data-field="title" value="${session.title || 'New Session'}" placeholder="Session Title">
                     <div class="level-up-group">
-                        <label for="session-levelups-${session.id}">Level Ups:</label>
+                        <label for="session-levelups-${session.id}" class="lvlup-label">Level Ups:</label>
                         <input type="number" id="session-levelups-${session.id}" data-field="levelUps" value="${session.levelUps || 0}" min="0">
                     </div>
                     <span class="expand-icon">►</span>

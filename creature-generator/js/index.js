@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     let currentEditingCreatureIdFromURL = null;
+    let currentCampaignFullData = null; // Holds all data for the currently loaded campaign
 
     // --- DOM Elements ---
     const creatureForm = document.getElementById('creatureForm');
@@ -21,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeIncompleteModalBtn = document.getElementById('closeIncompleteModalBtn');
     const confirmSaveIncompleteBtn = document.getElementById('confirmSaveIncompleteBtn');
     const cancelSaveIncompleteBtn = document.getElementById('cancelSaveIncompleteBtn');
+    const missingFieldsList = document.getElementById('missingFieldsList'); // For listing missing fields
 
     const creatureGeneratorPageContent = document.getElementById('creatureGeneratorPageContent'); 
 
@@ -53,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const LAST_VIEWED_CAMPAIGN_KEY = 'ttrpgSuite_lastViewedCampaign';
     const CAMPAIGN_DATA_PREFIX = 'ttrpgSuite_campaignData_';
-    const HOMEBREW_CREATURES_KEY = 'ttrpgSuite_homebrewCreatures';
+    const CREATURE_DATA_PREFIX = 'ttrpgSuite_creature_';
 
     const DCREATURE_DATA = {
         attrMod: { Low: [0,0,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6,7], Moderate: [2,2,3,3,3,3,4,4,4,4,4,5,5,5,5,5,6,6,6,6,6,7,7,8,8,9], High: [3,3,4,4,4,5,5,5,6,6,6,7,7,7,8,8,8,9,9,9,10,10,10,10,10,12], Extreme: [4,4,5,5,5,6,6,7,7,7,7,8,8,8,9,9,9,10,10,10,11,11,11,12,12,13]},
@@ -83,24 +85,58 @@ document.addEventListener('DOMContentLoaded', () => {
     const MAX_DIAGNOSTIC_TIER_NORMALIZATION = 5; 
 
 
-    // --- Cookie Helper Functions ---
-    function setCookie(name, value, days) {
+    // --- Cookie Helper Functions (JSON-aware) ---
+    function setCookie(name, value, days, isRawString = false) {
         let expires = "";
-        if (days) { const date = new Date(); date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000)); expires = "; expires=" + date.toUTCString(); }
-        document.cookie = name + "=" + (encodeURIComponent(value) || "") + expires + "; path=/; SameSite=Lax";
+        if (days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        const encodedValue = isRawString ? encodeURIComponent(value) : encodeURIComponent(JSON.stringify(value));
+        document.cookie = name + "=" + encodedValue + expires + "; path=/; SameSite=Lax";
     }
+
     function getCookie(name) {
-        const nameEQ = name + "="; const ca = document.cookie.split(';');
-        for (let i = 0; i < ca.length; i++) { let c = ca[i]; while (c.charAt(0) === ' ') c = c.substring(1, c.length); if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));}
+        const nameEQ = name + "=";
+        const ca = document.cookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) === 0) {
+                const value = c.substring(nameEQ.length, c.length);
+                try {
+                    const decoded = decodeURIComponent(value);
+                    try {
+                        return JSON.parse(decoded);
+                    } catch (e) {
+                        return decoded;
+                    }
+                } catch (e) {
+                    return value;
+                }
+            }
+        }
         return null;
     }
-    function generateUniqueId() { return Date.now().toString(36) + Math.random().toString(36).substring(2); }
+
+    function generateUniqueId() { return Date.now().toString(36) + Math.random().toString(36).substring(2, 9); }
+
 
     // --- "No Campaign" Modal Logic ---
     function openNoCampaignModalCreatureGen() { if (noCampaignModalCreatureGen) noCampaignModalCreatureGen.style.display = 'block'; if (creatureGeneratorPageContent) creatureGeneratorPageContent.style.display = 'none';}
     function closeNoCampaignModalCreatureGen() { if (noCampaignModalCreatureGen) noCampaignModalCreatureGen.style.display = 'none'; }
     if (closeNoCampaignModalCreatureGenBtn) closeNoCampaignModalCreatureGenBtn.addEventListener('click', closeNoCampaignModalCreatureGen);
-    if (modalCreateNewCampaignBtnCreatureGen) modalCreateNewCampaignBtnCreatureGen.addEventListener('click', () => { const n = "New Campaign"; const d = {name:n,description:"A new adventure awaits!",genre:"Fantasy",maturityRating:"TV-14",partyMembers:[],sessions:[]}; setCookie(CAMPAIGN_DATA_PREFIX+n,JSON.stringify(d),365); setCookie(LAST_VIEWED_CAMPAIGN_KEY,n,365); window.location.href='../index.html';}); // Redirect to main home which can lead to campaign page
+    if (modalCreateNewCampaignBtnCreatureGen) modalCreateNewCampaignBtnCreatureGen.addEventListener('click', () => { 
+        const n = "New Campaign"; 
+        const d = {
+            name:n, description:"A new adventure awaits!", genre:"Fantasy", maturityRating:"TV-14", partyMembers:[], sessions:[],
+            homebrewAssets: { creatures: [], items: [], spells: [] }
+        }; 
+        setCookie(CAMPAIGN_DATA_PREFIX+n, d, 365); 
+        setCookie(LAST_VIEWED_CAMPAIGN_KEY, n, 365, true); 
+        window.location.href='../homebrew';
+    });
     if (modalImportCampaignBtnCreatureGen) modalImportCampaignBtnCreatureGen.addEventListener('click', () => { alert('Import campaign functionality is not yet implemented.'); closeNoCampaignModalCreatureGen(); });
     window.addEventListener('click', (event) => { if (event.target === incompleteCreatureModal) { if(incompleteCreatureModal) incompleteCreatureModal.style.display = 'none'; creatureDataToSave = null;} if (event.target === noCampaignModalCreatureGen) closeNoCampaignModalCreatureGen();});
 
@@ -140,19 +176,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Campaign Party Data Retrieval ---
     function getCampaignPartyStats() {
-        const campaignName = getCookie(LAST_VIEWED_CAMPAIGN_KEY);
-        if (!campaignName) return { avgLevel: 1, numMembers: 4, memberMaxHPs: [] }; 
-        const campaignDataString = getCookie(CAMPAIGN_DATA_PREFIX + campaignName);
-        if (!campaignDataString) return { avgLevel: 1, numMembers: 4, memberMaxHPs: [] }; 
+        if (!currentCampaignFullData) return { avgLevel: 1, numMembers: 4, memberMaxHPs: [] };
         try {
-            const campaignData = JSON.parse(campaignDataString);
-            const partyMembers = campaignData.partyMembers || [];
-            const numMembers = partyMembers.length > 0 ? partyMembers.length : 4; 
-            let totalLevel = 0; const memberMaxHPs = [];
-            partyMembers.forEach(member => { const level = parseInt(member.level, 10); if (!isNaN(level)) totalLevel += level; const maxHP = parseInt(member.maxHp, 10); if (!isNaN(maxHP)) memberMaxHPs.push(maxHP);});
-            const avgLevel = numMembers > 0 && totalLevel > 0 ? Math.round(totalLevel / numMembers) : 1; 
+            const partyMembers = currentCampaignFullData.partyMembers || [];
+            const numMembers = partyMembers.length > 0 ? partyMembers.length : 4;
+            let totalLevel = 0;
+            const memberMaxHPs = [];
+            partyMembers.forEach(member => {
+                const level = parseInt(member.level, 10);
+                if (!isNaN(level)) totalLevel += level;
+                const maxHP = parseInt(member.maxHp, 10);
+                if (!isNaN(maxHP)) memberMaxHPs.push(maxHP);
+            });
+            const avgLevel = numMembers > 0 && totalLevel > 0 ? Math.round(totalLevel / numMembers) : 1;
             return { avgLevel: avgLevel || 1, numMembers: numMembers, memberMaxHPs: memberMaxHPs };
-        } catch (e) { console.error("Error parsing campaign party data:", e); return { avgLevel: 1, numMembers: 4, memberMaxHPs: [] };}
+        } catch (e) {
+            console.error("Error processing campaign party data:", e);
+            return { avgLevel: 1, numMembers: 4, memberMaxHPs: [] };
+        }
     }
     
     // --- Damage Calculation Helpers ---
@@ -316,26 +357,161 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Save Logic ---
     let creatureDataToSave = null; 
+    
+    function saveCurrentCampaignData() {
+        if (!currentCampaignFullData || !currentCampaignFullData.name) {
+            console.error("No campaign data is loaded. Cannot save campaign manifest.");
+            if(saveStatusCreature) saveStatusCreature.textContent = "Error: No campaign loaded.";
+            return false;
+        }
+        setCookie(CAMPAIGN_DATA_PREFIX + currentCampaignFullData.name, currentCampaignFullData, 365);
+        return true;
+    }
+
     function validateAndPrepareCreatureData() {
-        let isValid = true; const data = { id: currentEditingCreatureIdFromURL || generateUniqueId() };
-        data.name = creatureNameInput.value.trim(); if (!data.name) isValid = false; 
-        data.level = parseInt(creatureLevelInput.value,10); if (isNaN(data.level)) isValid = false;
-        document.querySelectorAll('select[data-stat]').forEach(select => { const statKey = select.dataset.stat; const tier = select.value; const customInput = document.getElementById(`${statKey}_custom`); let value; if (tier === "Custom") { value = customInput.type==='number'?parseFloat(customInput.value):customInput.value.trim(); if(customInput.type==='number'&&isNaN(value)) value=(statKey!=='strikeDmg'&&statKey!=='areaDmg')?0:""; if((!value&&value!==0&&value!==""))isValid=false;} else {value=getStatValue(statKey,tier,data.level);} data[`${statKey}_tier`]=tier; data[`${statKey}_value`]=value; if(value==="N/A"||value===undefined||(typeof value==='string'&&!value.trim()&&tier!=="Custom" && value !== ""))isValid=false;});
+        let isValid = true; 
+        const missingFields = [];
+        const data = { 
+            id: currentEditingCreatureIdFromURL || generateUniqueId(),
+            assetType: 'creature',
+            createdAt: Date.now()
+        };
+
+        data.name = creatureNameInput.value.trim(); 
+        if (!data.name) {
+            isValid = false;
+            missingFields.push("Creature Name");
+        }
+        
+        data.level = parseInt(creatureLevelInput.value, 10); 
+        if (isNaN(data.level)) {
+            isValid = false;
+            missingFields.push("Creature Level");
+        }
+
         data.isMagical = isMagicalSelect.value === 'yes';
-        if (data.isMagical) { ['spellAtkMod','spellDC','areaDmg'].forEach(statKey => { const select = document.getElementById(`${statKey}_tier`); const customInput = document.getElementById(`${statKey}_custom`); if(!select){isValid=false;return;} const tier = select.value; let value; if (tier === "Custom") { value = customInput.type==='number'?parseFloat(customInput.value):customInput.value.trim(); if(customInput.type==='number'&&isNaN(value))value=0; else if(typeof value==='string'&&!value)value=""; if((!value&&value!==0&&value!==""))isValid=false;} else {value=getStatValue(statKey,tier,data.level);} data[`${statKey}_tier`]=tier; data[`${statKey}_value`]=value; if(value==="N/A"||value===undefined||(typeof value==='string'&&!value.trim()&&tier!=="Custom"&& value !== ""))isValid=false;});}
-        else {data.spellAtkMod_tier="N/A";data.spellAtkMod_value=0;data.spellDC_tier="N/A";data.spellDC_value=0;data.areaDmg_tier="N/A";data.areaDmg_value="";}
+
+        document.querySelectorAll('select[data-stat]').forEach(select => {
+            const statKey = select.dataset.stat;
+            const isMagicalStat = ['spellAtkMod', 'spellDC', 'areaDmg'].includes(statKey);
+
+            // **THE FIX**: If the creature is NOT magical, SKIP validation for magical stats.
+            if (!data.isMagical && isMagicalStat) {
+                return; // This is like 'continue' in a forEach loop
+            }
+            
+            const tier = select.value;
+            const customInput = document.getElementById(`${statKey}_custom`);
+            let value;
+            let isCurrentFieldValid = true;
+
+            if (tier === "Custom") {
+                value = customInput.type === 'number' ? customInput.value : customInput.value.trim();
+                if (customInput.type === 'number') {
+                    if (value === '' || isNaN(parseFloat(value))) {
+                        isCurrentFieldValid = false;
+                    } else {
+                        value = parseFloat(value);
+                    }
+                } else if (!value) {
+                    isCurrentFieldValid = false;
+                }
+            } else {
+                value = getStatValue(statKey, tier, data.level);
+                if (value === "N/A" || value === undefined) {
+                    isCurrentFieldValid = false;
+                }
+            }
+            
+            if (!isCurrentFieldValid) {
+                isValid = false;
+                missingFields.push(STAT_DISPLAY_NAMES[statKey] || statKey);
+            }
+
+            data[`${statKey}_tier`] = tier;
+            data[`${statKey}_value`] = value;
+        });
+
+        // If not magical, ensure the magical properties are explicitly set to default non-validating values for data consistency.
+        if (!data.isMagical) {
+            data.spellAtkMod_tier = "N/A"; data.spellAtkMod_value = 0;
+            data.spellDC_tier = "N/A"; data.spellDC_value = 0;
+            data.areaDmg_tier = "N/A"; data.areaDmg_value = "";
+        }
+
         data.notes = document.getElementById('creatureNotes').value.trim();
-        return { isValid, data };
+        
+        if (!isValid) {
+            console.log("Validation failed. Missing fields:", missingFields);
+        }
+
+        return { isValid, data, missingFields };
     }
+
     function actualSaveCreature(creatureData) {
-        let creatures = []; try { const eJSON = localStorage.getItem(HOMEBREW_CREATURES_KEY); if(eJSON)creatures=JSON.parse(eJSON);}catch(e){console.error("Error parsing creatures:",e);creatures=[];}
-        let creatureUpdated = false;
-        if(currentEditingCreatureIdFromURL){ const idToMatch = currentEditingCreatureIdFromURL; const idx = creatures.findIndex(c=>c.id===idToMatch); if(idx > -1){ creatures[idx]={...creatureData,id:idToMatch}; if(saveStatusCreature)saveStatusCreature.textContent=`Creature "${creatureData.name}" updated!`; creatureUpdated=true;} else { const oldId = creatureData.id; creatureData.id=generateUniqueId(); creatures.push(creatureData); console.warn(`Edit target ${oldId} not found. Saved as NEW with ID ${creatureData.id}.`); if(saveStatusCreature)saveStatusCreature.textContent=`Creature "${creatureData.name}" (original not found) saved as new.`;}}
-        else { if(!creatureData.id)creatureData.id=generateUniqueId(); creatures.push(creatureData); if(saveStatusCreature)saveStatusCreature.textContent=`Creature "${creatureData.name}" saved to Homebrew!`;}
-        try { localStorage.setItem(HOMEBREW_CREATURES_KEY, JSON.stringify(creatures)); if(saveStatusCreature&&saveStatusCreature.textContent)setTimeout(()=>{if(saveStatusCreature)saveStatusCreature.textContent='';},3000);}catch(e){console.error("Error saving to localStorage:",e);if(saveStatusCreature){saveStatusCreature.textContent=`Error saving. Storage full?`;setTimeout(()=>{if(saveStatusCreature)saveStatusCreature.textContent='';},3000);}}
-        currentEditingCreatureIdFromURL=null; // Clear after save attempt
+        if (!currentCampaignFullData || !currentCampaignFullData.name) {
+            console.error("Cannot save creature, no campaign data loaded.");
+            if(saveStatusCreature) saveStatusCreature.textContent = "Error saving. No campaign loaded.";
+            return;
+        }
+
+        const campaignName = currentCampaignFullData.name;
+        const creatureId = creatureData.id;
+
+        const creatureCookieName = `${CREATURE_DATA_PREFIX}${campaignName}_${creatureId}`;
+        if (currentEditingCreatureIdFromURL) {
+            const oldCreatureData = getCookie(creatureCookieName);
+            creatureData.createdAt = (oldCreatureData && oldCreatureData.createdAt) ? oldCreatureData.createdAt : Date.now();
+        }
+        setCookie(creatureCookieName, creatureData, 365);
+
+        if (!currentCampaignFullData.homebrewAssets) {
+            currentCampaignFullData.homebrewAssets = { creatures: [], items: [], spells: [] };
+        }
+        if (!currentCampaignFullData.homebrewAssets.creatures) {
+            currentCampaignFullData.homebrewAssets.creatures = [];
+        }
+
+        const creatureIdManifest = currentCampaignFullData.homebrewAssets.creatures;
+        const isExisting = creatureIdManifest.includes(creatureId);
+
+        if (!isExisting) {
+            creatureIdManifest.push(creatureId);
+        }
+        
+        if (saveStatusCreature) {
+            saveStatusCreature.textContent = `Creature "${creatureData.name}" ${isExisting ? 'updated' : 'saved'}!`;
+        }
+
+        if (saveCurrentCampaignData()) {
+            if(saveStatusCreature && saveStatusCreature.textContent) {
+                setTimeout(() => {
+                    window.location.href = '../homebrew';
+                }, 500);
+            }
+        } else {
+            if(saveStatusCreature) {
+                saveStatusCreature.textContent = `Error saving campaign manifest.`;
+                setTimeout(() => { if(saveStatusCreature) saveStatusCreature.textContent = ''; }, 3000);
+            }
+        }
     }
-    if(creatureForm) creatureForm.addEventListener('submit',(e)=>{e.preventDefault();const vResult=validateAndPrepareCreatureData();if(vResult.isValid)actualSaveCreature(vResult.data);else{creatureDataToSave=vResult.data;if(incompleteCreatureModal)incompleteCreatureModal.style.display='block';}});
+
+    if(creatureForm) {
+        creatureForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const vResult = validateAndPrepareCreatureData();
+            if (vResult.isValid) {
+                actualSaveCreature(vResult.data);
+            } else {
+                creatureDataToSave = vResult.data;
+                if(missingFieldsList) {
+                    missingFieldsList.innerHTML = vResult.missingFields.map(field => `<li>${field}</li>`).join('');
+                }
+                if (incompleteCreatureModal) incompleteCreatureModal.style.display = 'block';
+            }
+        });
+    }
     if(confirmSaveIncompleteBtn) confirmSaveIncompleteBtn.addEventListener('click',()=>{if(creatureDataToSave)actualSaveCreature(creatureDataToSave);if(incompleteCreatureModal)incompleteCreatureModal.style.display='none';creatureDataToSave=null;});
     if(cancelSaveIncompleteBtn) cancelSaveIncompleteBtn.addEventListener('click',()=>{if(incompleteCreatureModal)incompleteCreatureModal.style.display='none';creatureDataToSave=null;});
     if(closeIncompleteModalBtn) closeIncompleteModalBtn.addEventListener('click',()=>{if(incompleteCreatureModal)incompleteCreatureModal.style.display='none';creatureDataToSave=null;});
@@ -345,188 +521,133 @@ document.addEventListener('DOMContentLoaded', () => {
     if (exportCreatureBtn) {
         exportCreatureBtn.addEventListener('click', () => {
             const params = new URLSearchParams();
-            let currentLevel = 1; // Default level
-
-            // Name
-            if (creatureNameInput) params.append('name', creatureNameInput.value.trim());
+            const vResult = validateAndPrepareCreatureData();
+            const creatureData = vResult.data;
             
-            // Level
-            if (creatureLevelInput) {
-                const parsedLevel = parseInt(creatureLevelInput.value, 10);
-                if (!isNaN(parsedLevel)) {
-                    currentLevel = parsedLevel;
+            for(const key in creatureData){
+                if (Object.prototype.hasOwnProperty.call(creatureData, key) && key !== 'createdAt' && key !== 'assetType') {
+                    params.append(key, creatureData[key]);
                 }
             }
-            params.append('level', currentLevel);
 
-            // isMagical
-            const isMagicalValue = isMagicalSelect ? isMagicalSelect.value : 'no';
-            params.append('isMagical', isMagicalValue);
-
-            // Notes
-            const notesTextarea = document.getElementById('creatureNotes');
-            if (notesTextarea) params.append('notes', notesTextarea.value.trim());
-
-            // Process all stats based on select[data-stat]
-            document.querySelectorAll('select[data-stat]').forEach(select => {
-                const statKey = select.dataset.stat;
-                const isMagicalStat = ['spellAtkMod', 'spellDC', 'areaDmg'].includes(statKey);
-
-                // Only include magical stats in URL if creature is actually magical
-                if (isMagicalStat && isMagicalValue !== 'yes') {
-                    return; // Skip appending these params for non-magical creatures
-                }
-
-                const tier = select.value;
-                const customInput = document.getElementById(`${statKey}_custom`);
-                let valueToStore;
-
-                if (tier === "Custom") {
-                    if (customInput) {
-                        const rawValue = customInput.value;
-                        if (customInput.type === 'number') {
-                            valueToStore = parseFloat(rawValue);
-                            if (isNaN(valueToStore)) valueToStore = 0; // Default for invalid number
-                        } else { // string type (e.g., damage strings, custom speed as text)
-                            valueToStore = rawValue.trim();
-                        }
-                    } else { // Fallback if custom input element is somehow missing
-                        // Determine a sensible default based on common stat types
-                        valueToStore = (statKey === 'strikeDmg' || statKey === 'areaDmg') ? "" : 0; 
-                    }
-                } else {
-                    // For non-custom tiers, get the calculated value.
-                    // The importing page's initializeForm will use the tier to recalculate if not custom,
-                    // but sending the value is consistent with how edit might work.
-                    valueToStore = getStatValue(statKey, tier, currentLevel);
-                }
-                
-                params.append(`${statKey}_tier`, tier);
-                if (valueToStore !== undefined && valueToStore !== null) {
-                    params.append(`${statKey}_value`, valueToStore);
-                }
-            });
-
-            const baseUrl = window.location.href.split('?')[0]; // Get current page URL without query params
+            const baseUrl = window.location.href.split('?')[0]; 
             const exportURL = baseUrl + '?' + params.toString();
-
-            navigator.clipboard.writeText(exportURL)
-                .then(() => {
-                    if (saveStatusCreature) {
-                        saveStatusCreature.textContent = "Creature URL copied to clipboard!";
-                        setTimeout(() => { if (saveStatusCreature) saveStatusCreature.textContent = ''; }, 3000);
-                    }
-                })
-                .catch(err => {
+            navigator.clipboard.writeText(exportURL).then(() => {
+                    if (saveStatusCreature) { saveStatusCreature.textContent = "Creature URL copied to clipboard!"; setTimeout(() => { if (saveStatusCreature) saveStatusCreature.textContent = ''; }, 3000); }
+                }).catch(err => {
                     console.error('Failed to copy URL: ', err);
-                    if (saveStatusCreature) {
-                        saveStatusCreature.textContent = "Failed to copy. URL in prompt.";
-                        setTimeout(() => { if (saveStatusCreature) saveStatusCreature.textContent = ''; }, 5000);
-                    }
-                    // Fallback for browsers where clipboard API might fail or not be permitted
+                    if (saveStatusCreature) { saveStatusCreature.textContent = "Failed to copy. URL in prompt."; setTimeout(() => { if (saveStatusCreature) saveStatusCreature.textContent = ''; }, 5000); }
                     prompt("Could not copy to clipboard. Manually copy this URL:", exportURL);
                 });
         });
     }
 
-    // --- URL Parameter Loading & Form Population ---
-    function loadCreatureFromURLParams() { 
-        const params = new URLSearchParams(window.location.search);
-        let isEditModeById = false; // Specifically tracks if an 'id' was present for editing an existing entity
+    // --- Form Population and Initialization ---
+    function populateFormWithCreatureData(creature) {
+        if (!creature) return;
+        if(creatureNameInput) creatureNameInput.value = creature.name || '';
+        if(creatureLevelInput) creatureLevelInput.value = creature.level || 1;
+        if(isMagicalSelect) isMagicalSelect.value = creature.isMagical ? 'yes' : 'no';
+        const notesTextarea = document.getElementById('creatureNotes');
+        if(notesTextarea) notesTextarea.value = creature.notes || '';
 
-        if (params.has('id')) {
-            currentEditingCreatureIdFromURL = params.get('id');
-            isEditModeById = true; // It's an edit of an existing creature
-            // Name and Level might also be in params for quick load, but initializeForm will handle general param loading.
-            if (creatureNameInput && params.has('name')) creatureNameInput.value = params.get('name');
-            // Level will be handled by initializeForm's updated logic
-            console.log("Attempting to load creature for editing. ID:", currentEditingCreatureIdFromURL);
-        } else {
-            currentEditingCreatureIdFromURL = null; // No 'id', so it's a new creature or from an export URL
-        }
-        return isEditModeById; // This indicates if we are editing a *saved* creature
-    }
-
-    function initializeForm() {
-        const campaignName = getCookie(LAST_VIEWED_CAMPAIGN_KEY);
-        if (!campaignName && noCampaignModalCreatureGen) { openNoCampaignModalCreatureGen(); return; }
-        if (creatureGeneratorPageContent) creatureGeneratorPageContent.style.display = 'block';
-
-        const params = new URLSearchParams(window.location.search);
-        const isEditModeById = loadCreatureFromURLParams(); // Sets currentEditingCreatureIdFromURL
-
-        // Set Level: Prioritize 'level' param if present, else use party avg for new, or keep existing for edit.
-        if (params.has('level') && creatureLevelInput) {
-            const levelVal = parseInt(params.get('level'), 10);
-            if(!isNaN(levelVal)) {
-                creatureLevelInput.value = Math.max(-1, Math.min(24, levelVal)); // Clamp level
-            } else {
-                creatureLevelInput.value = 1; // Default if 'level' param is invalid
-            }
-        } else if (!isEditModeById && creatureLevelInput) { // True new form (no 'id' and no 'level' param)
-            const partyStats = getCampaignPartyStats();
-            creatureLevelInput.value = (partyStats.avgLevel !== null && !isNaN(partyStats.avgLevel)) ? Math.max(-1, Math.min(24, partyStats.avgLevel)) : 1;
-        } else if (creatureLevelInput && (creatureLevelInput.value === "" || isNaN(parseInt(creatureLevelInput.value)))) {
-            // Fallback if level is still not set (e.g. edit mode without level param somehow)
-            creatureLevelInput.value = 1; 
-        }
-        
-        // Name: Load from param if present (covers export URL and edit URL if name is there)
-        if (params.has('name') && creatureNameInput) {
-             creatureNameInput.value = params.get('name');
-        }
-
-
-        // Populate and set stat selects and custom inputs from params
         document.querySelectorAll('select[data-stat]').forEach(select => {
-            populateTierSelect(select, select.dataset.stat); 
             const statKey = select.dataset.stat;
+            const tierKey = `${statKey}_tier`;
+            const valueKey = `${statKey}_value`;
 
-            if (params.has(`${statKey}_tier`)) { // Check if tier for this stat is in URL
-                const tierFromParam = params.get(`${statKey}_tier`);
-                // Check if this tier is a valid option in the select
-                let validTier = false;
-                for(let i=0; i < select.options.length; i++){
-                    if(select.options[i].value === tierFromParam) {
-                        validTier = true;
-                        break;
-                    }
-                }
-
-                if (validTier) {
-                    select.value = tierFromParam; 
-                } else { // Fallback to Moderate or first option if tier from URL is invalid
-                    select.value = (DCREATURE_DATA[select.dataset.stat] && DCREATURE_DATA[select.dataset.stat].Moderate !== undefined) ? 'Moderate' : (select.options.length > 0 ? select.options[0].value : '');
-                }
-
-                if (select.value === "Custom") { // Use select.value after potential validation/fallback
+            if (Object.prototype.hasOwnProperty.call(creature, tierKey)) {
+                select.value = creature[tierKey];
+                if (creature[tierKey] === 'Custom' && Object.prototype.hasOwnProperty.call(creature, valueKey)) {
                     const customInput = document.getElementById(`${statKey}_custom`);
-                    if (customInput && params.has(`${statKey}_value`)) {
-                        customInput.value = params.get(`${statKey}_value`);
-                    }
-                }
-            } else if (!isEditModeById) { // Default for new forms (no 'id' and no specific stat_tier param)
-                if (DCREATURE_DATA[select.dataset.stat] && DCREATURE_DATA[select.dataset.stat].Moderate !== undefined) {
-                    select.value = 'Moderate';
-                } else if (select.options.length > 0) {
-                    select.value = select.options[0].value;
+                    if (customInput) customInput.value = creature[valueKey];
                 }
             }
         });
-
-        if (params.has('isMagical') && isMagicalSelect) {
-            isMagicalSelect.value = params.get('isMagical');
-        } else if (!isEditModeById && isMagicalSelect) { // Default for new forms if not in params
-             isMagicalSelect.value = 'no';
-        }
-
-        if (params.has('notes')) {
-            const notesTextarea = document.getElementById('creatureNotes');
-            if (notesTextarea) notesTextarea.value = params.get('notes');
-        }
         
-        if(isMagicalSelect && magicalStatsContainer) magicalStatsContainer.style.display = isMagicalSelect.value === 'yes'?'block':'none';
-        updateAllStatDisplaysAndSuggestions(); 
+        updateAllStatDisplaysAndSuggestions();
     }
+    
+    function loadCampaignData() {
+        const campaignName = getCookie(LAST_VIEWED_CAMPAIGN_KEY);
+        if (!campaignName) {
+            openNoCampaignModalCreatureGen();
+            return false;
+        }
+
+        const campaignData = getCookie(CAMPAIGN_DATA_PREFIX + campaignName);
+        if (campaignData && typeof campaignData === 'object') {
+            currentCampaignFullData = campaignData;
+            if (!currentCampaignFullData.homebrewAssets) {
+                currentCampaignFullData.homebrewAssets = { creatures: [], items: [], spells: [] };
+            }
+            if (!Array.isArray(currentCampaignFullData.homebrewAssets.creatures)) {
+                currentCampaignFullData.homebrewAssets.creatures = [];
+            }
+            return true;
+        } else {
+            console.error("Failed to load or parse campaign data for:", campaignName);
+            openNoCampaignModalCreatureGen();
+            return false;
+        }
+    }
+
+    function initializeForm() {
+        if (!loadCampaignData()) return;
+
+        if (creatureGeneratorPageContent) creatureGeneratorPageContent.style.display = 'block';
+
+        const params = new URLSearchParams(window.location.search);
+        const isEditModeById = params.has('id');
+        currentEditingCreatureIdFromURL = isEditModeById ? params.get('id') : null;
+        
+        let creatureToLoad = null;
+
+        if (isEditModeById) {
+            const campaignName = currentCampaignFullData.name;
+            const creatureCookieName = `${CREATURE_DATA_PREFIX}${campaignName}_${currentEditingCreatureIdFromURL}`;
+            creatureToLoad = getCookie(creatureCookieName);
+            if (!creatureToLoad) {
+                console.warn(`Creature with ID ${currentEditingCreatureIdFromURL} not found. Treating as new.`);
+                currentEditingCreatureIdFromURL = null; 
+            }
+        } else if (params.toString()) {
+            creatureToLoad = {
+                name: params.get('name') || '',
+                level: params.get('level') || 1,
+                isMagical: params.get('isMagical') === 'true',
+                notes: params.get('notes') || ''
+            };
+            document.querySelectorAll('select[data-stat]').forEach(select => {
+                const statKey = select.dataset.stat;
+                if (params.has(`${statKey}_tier`)) {
+                    creatureToLoad[`${statKey}_tier`] = params.get(`${statKey}_tier`);
+                }
+                if (params.has(`${statKey}_value`)) {
+                    creatureToLoad[`${statKey}_value`] = params.get(`${statKey}_value`);
+                }
+            });
+            if (creatureToLoad.isMagical) {
+                 ['spellAtkMod','spellDC','areaDmg'].forEach(statKey => {
+                    if (params.has(`${statKey}_tier`)) creatureToLoad[`${statKey}_tier`] = params.get(`${statKey}_tier`);
+                    if (params.has(`${statKey}_value`)) creatureToLoad[`${statKey}_value`] = params.get(`${statKey}_value`);
+                });
+            }
+        }
+
+        if (creatureToLoad) {
+            populateFormWithCreatureData(creatureToLoad);
+        } else {
+            const partyStats = getCampaignPartyStats();
+            if(creatureLevelInput) creatureLevelInput.value = (partyStats.avgLevel !== null && !isNaN(partyStats.avgLevel)) ? Math.max(-1, Math.min(24, partyStats.avgLevel)) : 1;
+            document.querySelectorAll('select[data-stat]').forEach(select => {
+                if (DCREATURE_DATA[select.dataset.stat] && DCREATURE_DATA[select.dataset.stat].Moderate !== undefined) {
+                    select.value = 'Moderate';
+                }
+            });
+            updateAllStatDisplaysAndSuggestions();
+        }
+    }
+
     initializeForm();
 });

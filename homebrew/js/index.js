@@ -3,24 +3,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- DOM Elements ---
     const addNewHomebrewAssetBtn = document.getElementById('addNewHomebrewAssetBtn');
     const customAddAssetDropdown = document.getElementById('customAddAssetDropdown');
-    const homebrewAssetsColumnsContainer = document.getElementById('homebrewAssetsContainer'); // Will hold columns
-    const saveAllHomebrewBtn = document.getElementById('saveAllHomebrewBtn');
+    const homebrewAssetsColumnsContainer = document.getElementById('homebrewAssetsContainer');
+    const saveAllHomebrewBtn = document.getElementById('saveAllHomebrewBtn'); // This will be hidden/removed.
     const saveStatusHomebrew = document.getElementById('saveStatusHomebrew');
 
-    // Sort and Filter Controls (ensure these IDs match your HTML for homebrewcatalog.html)
     const sortAssetsBySelect = document.getElementById('sortAssetsBy');
     const reverseSortBtn = document.getElementById('reverseSortBtn');
-    const filterPanel = document.getElementById('filterPanel'); // The <aside> element
+    const filterPanel = document.getElementById('filterPanel');
 
-    // No Campaign Modal (Using IDs from your HTML's newUserModal)
+    // No Campaign Modal
     const noCampaignModalHomebrew = document.getElementById('newUserModal');
     const closeModalHomebrewBtn = noCampaignModalHomebrew ? noCampaignModalHomebrew.querySelector('.close-button') : null;
-    const modalCreateNewCampaignBtnHomebrew = document.getElementById('createNewCampaignBtn'); 
-    const modalViewCatalogAnywayBtn = document.getElementById('importCampaignBtn'); 
-
-    // Edit Creature Modal (Functionality is redirect)
-    const editCreatureModal = document.getElementById('editCreatureModal'); // Keep if HTML structure exists
-    const closeEditCreatureModalBtn = editCreatureModal ? editCreatureModal.querySelector('.close-edit-creature-modal-btn') : null;
+    const modalCreateNewCampaignBtnHomebrew = document.getElementById('createNewCampaignBtn');
+    const modalActionBtn = document.getElementById('importCampaignBtn');
 
     // Delete Asset Confirm Modal
     const deleteAssetConfirmModal = document.getElementById('deleteAssetConfirmModal');
@@ -30,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const cancelDeleteAssetBtn = document.getElementById('cancelDeleteAssetBtn');
     let assetToDelete = { id: null, type: null, name: null };
 
-    // Add New Item Modal (Ensure IDs match your HTML for the item creation modal)
+    // Add New Item Modal
     const addNewItemModal = document.getElementById('addNewItemModal');
     const closeAddNewItemModalBtn = document.getElementById('closeAddNewItemModalBtn');
     const addNewItemForm = document.getElementById('addNewItemForm');
@@ -39,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const newItemDescriptionInput = document.getElementById('newItemDescription');
     const cancelNewItemBtn = document.getElementById('cancelNewItemBtn');
 
-    // Add New Spell Modal (Ensure IDs match your HTML for the spell creation modal)
+    // Add New Spell Modal
     const addNewSpellModal = document.getElementById('addNewSpellModal');
     const closeAddNewSpellModalBtn = document.getElementById('closeAddNewSpellModalBtn');
     const addNewSpellForm = document.getElementById('addNewSpellForm');
@@ -48,81 +43,98 @@ document.addEventListener('DOMContentLoaded', () => {
     const newSpellDescriptionInput = document.getElementById('newSpellDescription');
     const cancelNewSpellBtn = document.getElementById('cancelNewSpellBtn');
 
-
-    // --- Storage Keys & Data ---
+    // --- Data Storage Keys ---
     const LAST_VIEWED_CAMPAIGN_KEY = 'ttrpgSuite_lastViewedCampaign';
     const CAMPAIGN_DATA_PREFIX = 'ttrpgSuite_campaignData_';
-    const HOMEBREW_CREATURES_KEY = 'ttrpgSuite_homebrewCreatures';
-    const HOMEBREW_ITEMS_KEY = 'ttrpgSuite_homebrewItems';
-    const HOMEBREW_SPELLS_KEY = 'ttrpgSuite_homebrewSpells';
-
-    let allHomebrewAssets = { creatures: [], items: [], spells: [] };
+    const CREATURE_DATA_PREFIX = 'ttrpgSuite_creature_';
+    const ITEM_DATA_PREFIX = 'ttrpgSuite_item_';
+    const SPELL_DATA_PREFIX = 'ttrpgSuite_spell_';
+    
+    let currentCampaignFullData = null; // Holds the campaign manifest (with asset IDs)
     let currentSort = { property: 'alphabetical', reversed: false };
-    let currentFilters = { creature: true, item: true, spell: true }; // Default: all checked
+    let currentFilters = { creature: true, item: true, spell: true };
+    const NUM_COLUMNS = 2;
 
-    const NUM_COLUMNS = 2; // Define number of columns for asset display
-
-    // --- Cookie/LocalStorage Helpers ---
-    function setCookie(name, value, days) {
+    // --- Cookie Helpers (JSON-aware) ---
+    function setCookie(name, value, days, isRawString = false) {
         let expires = "";
         if (days) {
             const date = new Date();
             date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
             expires = "; expires=" + date.toUTCString();
         }
-        document.cookie = name + "=" + (encodeURIComponent(value) || "") + expires + "; path=/; SameSite=Lax";
+        const encodedValue = isRawString ? encodeURIComponent(value) : encodeURIComponent(JSON.stringify(value));
+        document.cookie = name + "=" + encodedValue + expires + "; path=/; SameSite=Lax";
     }
+
     function getCookie(name) {
         const nameEQ = name + "=";
         const ca = document.cookie.split(';');
         for (let i = 0; i < ca.length; i++) {
             let c = ca[i];
             while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-            if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
+            if (c.indexOf(nameEQ) === 0) {
+                const value = c.substring(nameEQ.length, c.length);
+                try {
+                    const decoded = decodeURIComponent(value);
+                    try {
+                        return JSON.parse(decoded);
+                    } catch (e) {
+                        return decoded;
+                    }
+                } catch (e) {
+                    return value;
+                }
+            }
         }
         return null;
     }
+    
+    function deleteCookie(name) {
+        document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
+
     function generateUniqueId() {
         return Date.now().toString(36) + Math.random().toString(36).substring(2, 9);
     }
 
+    function keyToTitleCase(str) {
+        if (!str) return '';
+        // Handles camelCase and snake_case to produce a readable Title Case string.
+        return str
+            .replace(/_/g, ' ') 
+            .replace(/([A-Z])/g, ' $1') 
+            .replace(/\b\w/g, char => char.toUpperCase()) 
+            .trim();
+    }
+
     // --- Generic Modal Controls ---
-    function openModal(modalElement) {
-        if (modalElement) modalElement.style.display = 'block';
-    }
-    function closeModal(modalElement) {
-        if (modalElement) modalElement.style.display = 'none';
-    }
-    
+    function openModal(modalElement) { if (modalElement) modalElement.style.display = 'block'; }
+    function closeModal(modalElement) { if (modalElement) modalElement.style.display = 'none'; }
+
     // --- "No Campaign" Modal Logic ---
-    if(noCampaignModalHomebrew) {
-        if(closeModalHomebrewBtn) closeModalHomebrewBtn.addEventListener('click', () => closeModal(noCampaignModalHomebrew));
-        if(modalViewCatalogAnywayBtn && modalViewCatalogAnywayBtn.id === 'importCampaignBtn') { 
-            modalViewCatalogAnywayBtn.addEventListener('click', () => {
-                // Assuming this button means "View Catalog Anyway" despite its ID/HTML text
-                closeModal(noCampaignModalHomebrew);
-            });
+    if (noCampaignModalHomebrew) {
+        if (closeModalHomebrewBtn) closeModalHomebrewBtn.addEventListener('click', () => closeModal(noCampaignModalHomebrew));
+        if (modalActionBtn) {
+            modalActionBtn.textContent = "Go to Home";
+            modalActionBtn.addEventListener('click', () => { window.location.href = '../'; });
         }
         if (modalCreateNewCampaignBtnHomebrew) {
             modalCreateNewCampaignBtnHomebrew.addEventListener('click', () => {
                 const newCampaignName = "New Campaign";
-                const dummyCampaignData = { 
-                    name: newCampaignName, 
-                    description: "A new adventure begins!", 
-                    genre: "Fantasy", 
-                    maturityRating: "TV-14", 
-                    partyMembers: [], 
-                    sessions: [] // Ensure new campaigns have session array
+                const dummyCampaignData = {
+                    name: newCampaignName, description: "A new adventure begins!", genre: "Fantasy", maturityRating: "TV-14",
+                    partyMembers: [], sessions: [],
+                    homebrewAssets: { creatures: [], items: [], spells: [] }
                 };
-                setCookie(CAMPAIGN_DATA_PREFIX + newCampaignName, JSON.stringify(dummyCampaignData), 365);
-                setCookie(LAST_VIEWED_CAMPAIGN_KEY, newCampaignName, 365);
-                window.location.href = '../index.html'; // Adjust to your Campaign Details page path
+                setCookie(CAMPAIGN_DATA_PREFIX + newCampaignName, dummyCampaignData, 365);
+                setCookie(LAST_VIEWED_CAMPAIGN_KEY, newCampaignName, 365, true);
+                window.location.reload();
             });
         }
     }
-
-
-    // --- Add New Asset Custom Dropdown & Handling ---
+    
+    // --- Add New Asset Dropdown & Handling ---
     if (addNewHomebrewAssetBtn && customAddAssetDropdown) {
         addNewHomebrewAssetBtn.addEventListener('click', (event) => {
             event.stopPropagation();
@@ -138,80 +150,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Add New Item Modal Logic ---
-    if (addNewItemModal) {
-        if (closeAddNewItemModalBtn) {
-            closeAddNewItemModalBtn.addEventListener('click', () => {
-                closeModal(addNewItemModal);
-                if (addNewItemForm) addNewItemForm.reset();
-            });
-        }
-        if (cancelNewItemBtn) {
-            cancelNewItemBtn.addEventListener('click', () => {
-                closeModal(addNewItemModal);
-                if (addNewItemForm) addNewItemForm.reset();
-            });
-        }
-        if (addNewItemForm) {
-            addNewItemForm.addEventListener('submit', (event) => {
-                event.preventDefault();
-                const itemName = newItemNameInput.value.trim();
-                const itemDurability = newItemDurabilityInput.value.trim();
-                const itemDescription = newItemDescriptionInput.value.trim();
-
-                if (!itemName) { alert("Item Name is required."); newItemNameInput.focus(); return; }
-                if (!itemDescription) { alert("Item Description is required."); newItemDescriptionInput.focus(); return;}
-
-                const newItemData = { id: generateUniqueId(), assetType: 'item', name: itemName, durability: itemDurability, description: itemDescription, isExpanded: false, createdAt: Date.now() };
-                allHomebrewAssets.items.push(newItemData);
-                saveHomebrewAssets('items'); 
-                closeModal(addNewItemModal);
-                addNewItemForm.reset(); 
-                processAndRenderAssets(); 
-                if (saveStatusHomebrew) { saveStatusHomebrew.textContent = `Item "${itemName}" added and saved!`; setTimeout(() => { if (saveStatusHomebrew) saveStatusHomebrew.textContent = ''; }, 3000); }
-            });
-        }
-    }
-
-    // --- Add New Spell Modal Logic ---
-    if (addNewSpellModal) {
-        if (closeAddNewSpellModalBtn) {
-            closeAddNewSpellModalBtn.addEventListener('click', () => {
-                closeModal(addNewSpellModal);
-                if (addNewSpellForm) addNewSpellForm.reset();
-            });
-        }
-        if (cancelNewSpellBtn) {
-            cancelNewSpellBtn.addEventListener('click', () => {
-                closeModal(addNewSpellModal);
-                if (addNewSpellForm) addNewSpellForm.reset();
-            });
-        }
-        if (addNewSpellForm) {
-            addNewSpellForm.addEventListener('submit', (event) => {
-                event.preventDefault();
-                const spellName = newSpellNameInput.value.trim();
-                const spellRequiredLevel = newSpellRequiredLevelInput.value.trim();
-                const spellDescription = newSpellDescriptionInput.value.trim();
-                if (!spellName) { alert("Spell Name is required."); newSpellNameInput.focus(); return; }
-                if (!spellDescription) { alert("Spell Description is required."); newSpellDescriptionInput.focus(); return;}
-                const newSpellData = { id: generateUniqueId(), assetType: 'spell', name: spellName, requiredLevel: spellRequiredLevel, description: spellDescription, isExpanded: false, createdAt: Date.now() };
-                allHomebrewAssets.spells.push(newSpellData);
-                saveHomebrewAssets('spells');
-                closeModal(addNewSpellModal);
-                addNewSpellForm.reset();
-                processAndRenderAssets();
-                if (saveStatusHomebrew) { saveStatusHomebrew.textContent = `Spell "${spellName}" added and saved!`; setTimeout(() => { if (saveStatusHomebrew) saveStatusHomebrew.textContent = ''; }, 3000); }
-            });
-        }
-    }
-    
     function handleAddNewAsset(type) {
         if (type === 'creature') {
-            window.location.href = '../creature-generator'; // Adjust path as needed
+            window.location.href = '../creature-generator';
         } else if (type === 'item') {
             if (addNewItemForm) addNewItemForm.reset();
-            openModal(addNewItemModal); 
+            openModal(addNewItemModal);
             if (newItemNameInput) newItemNameInput.focus();
         } else if (type === 'spell') {
             if (addNewSpellForm) addNewSpellForm.reset();
@@ -219,127 +163,169 @@ document.addEventListener('DOMContentLoaded', () => {
             if (newSpellNameInput) newSpellNameInput.focus();
         }
     }
-    
-    // --- Edit Creature: Redirect to Generator ---
-    function redirectToCreatureEditor(creatureId) {
-        const creature = allHomebrewAssets.creatures.find(c => c.id === creatureId);
-        if (!creature) { console.error("Creature not found for editing:", creatureId); return; }
-        const params = new URLSearchParams();
-        params.append('id', creature.id);
-        params.append('name', creature.name);
-        params.append('level', creature.level);
-        // Add all relevant creature properties to params...
-        const statsToParam = ['armorClass', 'hitPoints', 'speed', 'attrMod', 'perception', 'skills', 'savingThrows', 'strikeAtkBonus', 'strikeDmg', 'resistAndWeak'];
-        statsToParam.forEach(statKey => {
-            if (creature[`${statKey}_tier`]) params.append(`${statKey}_tier`, creature[`${statKey}_tier`]);
-            if (creature[`${statKey}_value`] !== undefined) params.append(`${statKey}_value`, creature[`${statKey}_value`]);
+
+    // --- Add/Delete/Edit Asset Logic ---
+    if (addNewItemForm) {
+        if(closeAddNewItemModalBtn) closeAddNewItemModalBtn.addEventListener('click', () => closeModal(addNewItemModal));
+        if(cancelNewItemBtn) cancelNewItemBtn.addEventListener('click', () => closeModal(addNewItemModal));
+        addNewItemForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const itemName = newItemNameInput.value.trim();
+            if (!itemName || !currentCampaignFullData) return;
+            
+            const newItemData = { id: generateUniqueId(), assetType: 'item', name: itemName, durability: newItemDurabilityInput.value.trim(), description: newItemDescriptionInput.value.trim(), isExpanded: false, createdAt: Date.now() };
+            
+            setCookie(`${ITEM_DATA_PREFIX}${currentCampaignFullData.name}_${newItemData.id}`, newItemData, 365);
+            currentCampaignFullData.homebrewAssets.items.push(newItemData.id);
+            saveCurrentCampaignData();
+
+            closeModal(addNewItemModal);
+            addNewItemForm.reset();
+            fetchAllAssetsAndRender();
+            if (saveStatusHomebrew) { saveStatusHomebrew.textContent = `Item "${itemName}" added and saved!`; setTimeout(() => { if (saveStatusHomebrew) saveStatusHomebrew.textContent = ''; }, 3000); }
         });
-        params.append('isMagical', creature.isMagical ? 'yes' : 'no');
-        if (creature.isMagical) {
-            const magicalStats = ['spellAtkMod', 'spellDC', 'areaDmg'];
-            magicalStats.forEach(statKey => {
-                 if (creature[`${statKey}_tier`]) params.append(`${statKey}_tier`, creature[`${statKey}_tier`]);
-                 if (creature[`${statKey}_value`] !== undefined) params.append(`${statKey}_value`, creature[`${statKey}_value`]);
-            });
-        }
-        if(creature.notes) params.append('notes', creature.notes);
-        window.location.href = `../creature-generator?${params.toString()}`; // Adjust path
     }
 
-    // --- Delete Asset Modal & Logic ---
-    if(deleteAssetConfirmModal) { // Ensure modal element exists
-        if(closeDeleteAssetConfirmModalBtn) closeDeleteAssetConfirmModalBtn.addEventListener('click', () => closeModal(deleteAssetConfirmModal));
-        if(cancelDeleteAssetBtn) cancelDeleteAssetBtn.addEventListener('click', () => closeModal(deleteAssetConfirmModal));
-        if(confirmDeleteAssetBtn) {
-            confirmDeleteAssetBtn.addEventListener('click', () => {
-                if (assetToDelete.id && assetToDelete.type) {
-                    let listChanged = false;
-                    const typePlural = assetToDelete.type + 's'; 
+    if (addNewSpellForm) {
+        if(closeAddNewSpellModalBtn) closeAddNewSpellModalBtn.addEventListener('click', () => closeModal(addNewSpellModal));
+        if(cancelNewSpellBtn) cancelNewSpellBtn.addEventListener('click', () => closeModal(addNewSpellModal));
+        addNewSpellForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const spellName = newSpellNameInput.value.trim();
+            if (!spellName || !currentCampaignFullData) return;
 
-                    if (allHomebrewAssets[typePlural]) {
-                        allHomebrewAssets[typePlural] = allHomebrewAssets[typePlural].filter(asset => asset.id !== assetToDelete.id);
-                        saveHomebrewAssets(typePlural);
-                        listChanged = true;
-                    }
-                    
-                    if (listChanged) {
-                        processAndRenderAssets(); // Refresh display
-                        if(saveStatusHomebrew) {
-                            saveStatusHomebrew.textContent = `"${assetToDelete.name || 'Asset'}" deleted.`;
-                            setTimeout(() => {if(saveStatusHomebrew)saveStatusHomebrew.textContent = ''}, 3000);
-                        }
-                    }
-                }
-                closeModal(deleteAssetConfirmModal);
-                assetToDelete = { id: null, type: null, name: null };
-            });
-        }
+            const newSpellData = { id: generateUniqueId(), assetType: 'spell', name: spellName, requiredLevel: newSpellRequiredLevelInput.value.trim(), description: newSpellDescriptionInput.value.trim(), isExpanded: false, createdAt: Date.now() };
+            
+            setCookie(`${SPELL_DATA_PREFIX}${currentCampaignFullData.name}_${newSpellData.id}`, newSpellData, 365);
+            currentCampaignFullData.homebrewAssets.spells.push(newSpellData.id);
+            saveCurrentCampaignData();
+
+            closeModal(addNewSpellModal);
+            addNewSpellForm.reset();
+            fetchAllAssetsAndRender();
+            if (saveStatusHomebrew) { saveStatusHomebrew.textContent = `Spell "${spellName}" added and saved!`; setTimeout(() => { if (saveStatusHomebrew) saveStatusHomebrew.textContent = ''; }, 3000); }
+        });
     }
     
     function openDeleteConfirmationModal(id, name, type) {
         assetToDelete = { id, type, name };
-        if(deleteAssetConfirmMessage) deleteAssetConfirmMessage.textContent = `Are you sure you want to delete "${name || 'this asset'}"? This action is permanent.`;
+        if (deleteAssetConfirmMessage) deleteAssetConfirmMessage.textContent = `Are you sure you want to delete "${name || 'this asset'}"? This action is permanent.`;
         openModal(deleteAssetConfirmModal);
     }
 
-    // --- Save & Load Homebrew Assets ---
-    function saveHomebrewAssets(assetTypeKeyPlural) {
-        try {
-            const keyMap = {
-                'creatures': HOMEBREW_CREATURES_KEY,
-                'items': HOMEBREW_ITEMS_KEY,
-                'spells': HOMEBREW_SPELLS_KEY
-            };
-            const storageKey = keyMap[assetTypeKeyPlural];
-            if (storageKey && allHomebrewAssets[assetTypeKeyPlural]) {
-                localStorage.setItem(storageKey, JSON.stringify(allHomebrewAssets[assetTypeKeyPlural]));
-                console.log(`${assetTypeKeyPlural} saved to localStorage using key ${storageKey}.`);
-            } else {
-                console.warn("Invalid asset type key for saving:", assetTypeKeyPlural);
-            }
-        } catch (e) {
-            console.error(`Error saving ${assetTypeKeyPlural} to localStorage:`, e);
-            if (saveStatusHomebrew) saveStatusHomebrew.textContent = "Error saving assets!";
+    if (deleteAssetConfirmModal) {
+        if(closeDeleteAssetConfirmModalBtn) closeDeleteAssetConfirmModalBtn.addEventListener('click', () => closeModal(deleteAssetConfirmModal));
+        if(cancelDeleteAssetBtn) cancelDeleteAssetBtn.addEventListener('click', () => closeModal(deleteAssetConfirmModal));
+        if (confirmDeleteAssetBtn) {
+            confirmDeleteAssetBtn.addEventListener('click', () => {
+                if (assetToDelete.id && assetToDelete.type && currentCampaignFullData && currentCampaignFullData.homebrewAssets) {
+                    const campaignName = currentCampaignFullData.name;
+                    const typePlural = assetToDelete.type + 's';
+                    
+                    let prefix = '';
+                    if (assetToDelete.type === 'creature') prefix = CREATURE_DATA_PREFIX;
+                    else if (assetToDelete.type === 'item') prefix = ITEM_DATA_PREFIX;
+                    else if (assetToDelete.type === 'spell') prefix = SPELL_DATA_PREFIX;
+                    
+                    if (prefix) deleteCookie(`${prefix}${campaignName}_${assetToDelete.id}`);
+
+                    if (currentCampaignFullData.homebrewAssets[typePlural]) {
+                        currentCampaignFullData.homebrewAssets[typePlural] = currentCampaignFullData.homebrewAssets[typePlural].filter(id => id !== assetToDelete.id);
+                        saveCurrentCampaignData();
+                    }
+
+                    fetchAllAssetsAndRender();
+
+                    if (saveStatusHomebrew) {
+                        saveStatusHomebrew.textContent = `"${assetToDelete.name || 'Asset'}" deleted.`;
+                        setTimeout(() => { if (saveStatusHomebrew) saveStatusHomebrew.textContent = '' }, 3000);
+                    }
+                }
+                closeModal(deleteAssetConfirmModal);
+            });
         }
     }
 
-    function loadAllHomebrewAssets() {
-        const now = Date.now();
-        try {
-            allHomebrewAssets.creatures = JSON.parse(localStorage.getItem(HOMEBREW_CREATURES_KEY) || '[]').map(c => ({...c, assetType: 'creature', isExpanded: false, createdAt: c.createdAt || now}));
-            allHomebrewAssets.items = JSON.parse(localStorage.getItem(HOMEBREW_ITEMS_KEY) || '[]').map(i => ({...i, assetType: 'item', isExpanded: false, createdAt: i.createdAt || now}));
-            allHomebrewAssets.spells = JSON.parse(localStorage.getItem(HOMEBREW_SPELLS_KEY) || '[]').map(s => ({...s, assetType: 'spell', isExpanded: false, createdAt: s.createdAt || now}));
-        } catch (e) {
-            console.error("Error loading homebrew assets from localStorage:", e);
-            allHomebrewAssets = { creatures: [], items: [], spells: [] };
+    function saveCurrentCampaignData() {
+        if (!currentCampaignFullData || !currentCampaignFullData.name) {
+            console.error("No campaign manifest is loaded. Cannot save.");
+            return;
         }
-        processAndRenderAssets(); // This will filter, sort, and then render
+        setCookie(CAMPAIGN_DATA_PREFIX + currentCampaignFullData.name, currentCampaignFullData, 365);
+        if (saveAllHomebrewBtn) saveAllHomebrewBtn.style.display = 'none';
+    }
+
+    // --- Core Loading and Rendering Pipeline ---
+
+    function loadCampaignAndAssets() {
+        const campaignName = getCookie(LAST_VIEWED_CAMPAIGN_KEY);
+        if (!campaignName) {
+            openModal(noCampaignModalHomebrew);
+            if (addNewHomebrewAssetBtn) addNewHomebrewAssetBtn.style.display = 'none';
+            return;
+        }
+
+        const campaignData = getCookie(CAMPAIGN_DATA_PREFIX + campaignName);
+        if (campaignData && typeof campaignData === 'object') {
+            currentCampaignFullData = campaignData;
+
+            if (!currentCampaignFullData.homebrewAssets) {
+                currentCampaignFullData.homebrewAssets = { creatures: [], items: [], spells: [] };
+            }
+            if (!Array.isArray(currentCampaignFullData.homebrewAssets.creatures)) currentCampaignFullData.homebrewAssets.creatures = [];
+            if (!Array.isArray(currentCampaignFullData.homebrewAssets.items)) currentCampaignFullData.homebrewAssets.items = [];
+            if (!Array.isArray(currentCampaignFullData.homebrewAssets.spells)) currentCampaignFullData.homebrewAssets.spells = [];
+
+            fetchAllAssetsAndRender();
+        } else {
+            console.error("Failed to load campaign data for:", campaignName);
+            openModal(noCampaignModalHomebrew);
+            if (addNewHomebrewAssetBtn) addNewHomebrewAssetBtn.style.display = 'none';
+        }
+    }
+
+    async function fetchAllAssetsAndRender() {
+        if (!currentCampaignFullData || !currentCampaignFullData.homebrewAssets) {
+            renderHomebrewAssets([]);
+            return;
+        }
+
+        const campaignName = currentCampaignFullData.name;
+        const combinedAssets = [];
+
+        const fetchAsset = (id, type) => {
+            let prefix = '';
+            if (type === 'creature') prefix = CREATURE_DATA_PREFIX;
+            else if (type === 'item') prefix = ITEM_DATA_PREFIX;
+            else if (type === 'spell') prefix = SPELL_DATA_PREFIX;
+            const asset = getCookie(`${prefix}${campaignName}_${id}`);
+            if (asset) {
+                asset.assetType = asset.assetType || type;
+                asset.isExpanded = asset.isExpanded || false; // Preserve expanded state from cookie
+                asset.createdAt = asset.createdAt || Date.now();
+                combinedAssets.push(asset);
+            } else {
+                console.warn(`Could not find asset data for type '${type}' with ID '${id}'. It may have been deleted.`);
+            }
+        };
+
+        (currentCampaignFullData.homebrewAssets.creatures || []).forEach(id => fetchAsset(id, 'creature'));
+        (currentCampaignFullData.homebrewAssets.items || []).forEach(id => fetchAsset(id, 'item'));
+        (currentCampaignFullData.homebrewAssets.spells || []).forEach(id => fetchAsset(id, 'spell'));
+        
+        const sortedAndFilteredAssets = applyFiltersAndSort(combinedAssets);
+        renderHomebrewAssets(sortedAndFilteredAssets);
     }
     
-    // --- Sorting and Filtering Logic ---
-    function applyFiltersAndSort() {
-        // Ensure assetType is present on all loaded assets for reliable filtering
-        let combinedAssets = [
-            ...(allHomebrewAssets.creatures || []),
-            ...(allHomebrewAssets.items || []),
-            ...(allHomebrewAssets.spells || [])
-        ].map(asset => ({ // Ensure assetType is part of each object if not already
-            ...asset, 
-            assetType: asset.assetType || (allHomebrewAssets.creatures.includes(asset) ? 'creature' : (allHomebrewAssets.items.includes(asset) ? 'item' : 'spell'))
-        }));
+    function applyFiltersAndSort(assets) {
+        if (!assets) return [];
+        let combinedAssets = [...assets];
 
-
-        // Apply Filters
-        if (currentFilters && Object.keys(currentFilters).length > 0) {
+        if (currentFilters) {
             const activeAssetTypes = Object.keys(currentFilters).filter(type => currentFilters[type]);
-            if (activeAssetTypes.length > 0) { // Only filter if some types are selected
-                 combinedAssets = combinedAssets.filter(asset => asset.assetType && activeAssetTypes.includes(asset.assetType));
-            } else { // If no filters checked, show nothing (or everything, depending on desired behavior)
-                combinedAssets = []; // Show nothing if no filter is active
-            }
+            combinedAssets = combinedAssets.filter(asset => activeAssetTypes.includes(asset.assetType));
         }
 
-        // Apply Sort
         if (currentSort && currentSort.property) {
             switch (currentSort.property) {
                 case 'alphabetical':
@@ -358,135 +344,58 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return combinedAssets;
     }
-    
+
     function processAndRenderAssets() {
-        const assetsToRender = applyFiltersAndSort();
-        renderHomebrewAssets(assetsToRender);
-    }
-
-    // Event Listeners for Sort Controls
-    if (sortAssetsBySelect) {
-        sortAssetsBySelect.addEventListener('change', (e) => {
-            currentSort.property = e.target.value;
-            processAndRenderAssets();
-        });
-    }
-    if (reverseSortBtn) {
-        reverseSortBtn.addEventListener('click', () => {
-            currentSort.reversed = !currentSort.reversed;
-            reverseSortBtn.innerHTML = currentSort.reversed ? '&#x2191;' : '&#x2193;'; 
-            reverseSortBtn.title = currentSort.reversed ? "Sort Ascending" : "Sort Descending";
-            processAndRenderAssets();
-        });
-    }
-
-    // Event Listeners for Filter Controls
-    if (filterPanel) {
-        filterPanel.querySelectorAll('input[type="checkbox"][data-filter-type]').forEach(checkbox => {
-            checkbox.addEventListener('change', (e) => {
-                const filterType = e.target.dataset.filterType;
-                if (filterType && currentFilters.hasOwnProperty(filterType)) {
-                    currentFilters[filterType] = e.target.checked;
-                    processAndRenderAssets();
-                }
-            });
-        });
+        fetchAllAssetsAndRender();
     }
     
-    // Helper function for individual card expansion
     const setupExpansionToggle = (cardElement, assetObject) => {
         const header = cardElement.querySelector('.homebrew-asset-header');
-        const expandIcon = header ? header.querySelector('.expand-icon') : null;
-        if (header && expandIcon) {
-            header.addEventListener('click', () => {
+        if (header) {
+            header.addEventListener('click', (e) => {
+                if(e.target.closest('.asset-inline-actions')) return;
                 assetObject.isExpanded = !assetObject.isExpanded;
                 cardElement.classList.toggle('expanded');
-                //expandIcon.textContent = assetObject.isExpanded ? '▼' : '►';
+                const prefix = assetObject.assetType === 'creature' ? CREATURE_DATA_PREFIX : assetObject.assetType === 'item' ? ITEM_DATA_PREFIX : SPELL_DATA_PREFIX;
+                setCookie(`${prefix}${currentCampaignFullData.name}_${assetObject.id}`, assetObject, 365);
             });
         }
     };
-    
-    // --- Render Assets into Columns ---
-    function renderHomebrewAssets(assetsToRender) {
-        if (!homebrewAssetsColumnsContainer) {
-            console.error("Asset columns container #homebrewAssetsContainer not found!");
-            return;
-        }
-        homebrewAssetsColumnsContainer.innerHTML = ''; 
 
-        if (!assetsToRender || assetsToRender.length === 0) {
-            homebrewAssetsColumnsContainer.innerHTML = "<p>No homebrew assets match your current filters or none exist.</p>";
-            return;
-        }
-
-        // Create column divs
-        const columns = [];
-        for (let i = 0; i < NUM_COLUMNS; i++) {
-            const columnDiv = document.createElement('div');
-            columnDiv.className = 'asset-column';
-            columns.push(columnDiv);
-            homebrewAssetsColumnsContainer.appendChild(columnDiv);
-        }
-
-        // Distribute assets into columns
-        assetsToRender.forEach((asset, index) => {
-            const columnIndex = index % NUM_COLUMNS;
-            const card = createAssetCard(asset); 
-            if (columns[columnIndex]) {
-                columns[columnIndex].appendChild(card);
-            } else {
-                console.error("Error: Column index out of bounds during rendering.");
-                // Fallback: append to main container if columns somehow fail
-                homebrewAssetsColumnsContainer.appendChild(card);
-            }
-        });
+    function redirectToCreatureEditor(creatureId) {
+        const params = new URLSearchParams({ id: creatureId });
+        window.location.href = `../creature-generator?${params.toString()}`;
     }
 
-    function createAssetCard(asset) { // asset should have assetType property
+    function createAssetCard(asset) {
         const card = document.createElement('div');
         card.className = `homebrew-asset-card ${asset.assetType}-card`;
         if (asset.isExpanded) card.classList.add('expanded');
         card.dataset.assetId = asset.id;
 
         let contentHtml = '';
-        const assetTypeDisplay = asset.assetType ? asset.assetType.charAt(0).toUpperCase() + asset.assetType.slice(1) : 'Asset';
+        const assetTypeDisplay = asset.assetType.charAt(0).toUpperCase() + asset.assetType.slice(1);
         let headerName = asset.name || `New ${assetTypeDisplay}`;
 
-
         if (asset.assetType === 'creature') {
-            let creatureDetailsHtml = '<div class="creature-full-details">';
-            creatureDetailsHtml += `<p><strong>Name:</strong> ${asset.name || 'N/A'}</p>`;
-            creatureDetailsHtml += `<p><strong>Level:</strong> ${asset.level !== undefined ? asset.level : 'N/A'}</p>`;
-            const simpleStats = ['hitPoints', 'armorClass', 'speed', 'perception', 'savingThrows', 'skills', 'attrMod', 'strikeAtkBonus', 'resistAndWeak'];
-            simpleStats.forEach(key => {
-                const tier = asset[`${key}_tier`];
-                const value = asset[`${key}_value`];
-                const keyDisplay = (key.charAt(0).toUpperCase() + key.slice(1)).replace(/([A-Z])/g, ' $1');
-                if (value !== undefined) {
-                     creatureDetailsHtml += `<p><strong>${keyDisplay}:</strong> ${value} ${tier && tier !== 'Custom' ? `(${tier})` : ''}</p>`;
-                }
-            });
-            if (asset.strikeDmg_value) { creatureDetailsHtml += `<p><strong>Strike Damage:</strong> ${asset.strikeDmg_value} ${asset.strikeDmg_tier && asset.strikeDmg_tier !== 'Custom' ? `(${asset.strikeDmg_tier})` : ''}</p>`; }
-            creatureDetailsHtml += `<p><strong>Magical:</strong> ${asset.isMagical ? 'Yes' : 'No'}</p>`;
-            if (asset.isMagical) {
-                const magicalStats = ['spellAtkMod', 'spellDC', 'areaDmg'];
-                 magicalStats.forEach(key => {
-                    const tier = asset[`${key}_tier`];
-                    const value = asset[`${key}_value`];
-                    const keyDisplay = (key.charAt(0).toUpperCase() + key.slice(1)).replace(/([A-Z])/g, ' $1');
-                    if (value !== undefined && (value !== 0 || typeof value === 'string' && value !== "")) { 
-                         creatureDetailsHtml += `<p><strong>${keyDisplay}:</strong> ${value} ${tier && tier !== 'Custom' && tier !== "N/A" ? `(${tier})` : ''}</p>`;
+            let detailsHtml = '';
+            const excludedKeys = new Set(['id', 'assetType', 'isExpanded', 'createdAt', 'name']);
+            
+            // Generate stat block HTML by iterating through the creature's properties
+            for (const key in asset) {
+                if (Object.prototype.hasOwnProperty.call(asset, key) && !excludedKeys.has(key)) {
+                    const title = keyToTitleCase(key);
+                    const value = asset[key];
+                    // Skip empty or null notes, and handle boolean 'isMagical'
+                    if (key === 'notes' && !value) continue; 
+                    if (key === 'isMagical') {
+                         detailsHtml += `<p><strong>Magical:</strong> ${value ? 'Yes' : 'No'}</p>`;
+                    } else {
+                         detailsHtml += `<p><strong>${title}:</strong> ${value}</p>`;
                     }
-                });
+                }
             }
-            if (asset.notes) { creatureDetailsHtml += `<p class="notes-section"><strong>Notes:</strong><br>${asset.notes.replace(/\n/g, '<br>')}</p>`;}
-            creatureDetailsHtml += '</div>';
-            creatureDetailsHtml += `
-                <div class="asset-inline-actions">
-                    <button class="btn btn-primary edit-creature-btn">Edit</button>
-                    <button class="btn btn-delete delete-asset-btn">Delete</button>
-                </div>`;
-            contentHtml = creatureDetailsHtml;
+            contentHtml = `<div class="creature-full-details">${detailsHtml}</div>`;
         } else if (asset.assetType === 'item') {
             contentHtml = `
                 <div class="form-group">
@@ -500,9 +409,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="form-group">
                     <label for="item-description-${asset.id}">Description:</label>
                     <textarea id="item-description-${asset.id}" data-field="description" rows="3" placeholder="Item description...">${asset.description || ''}</textarea>
-                </div>
-                <div class="asset-inline-actions">
-                    <button class="btn btn-delete delete-asset-btn">Delete</button>
                 </div>`;
         } else if (asset.assetType === 'spell') {
             contentHtml = `
@@ -517,9 +423,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="form-group">
                     <label for="spell-description-${asset.id}">Description:</label>
                     <textarea id="spell-description-${asset.id}" data-field="description" rows="3" placeholder="Spell description...">${asset.description || ''}</textarea>
-                </div>
-                <div class="asset-inline-actions">
-                    <button class="btn btn-delete delete-asset-btn">Delete</button>
                 </div>`;
         }
         
@@ -533,97 +436,107 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <div class="homebrew-asset-content">
                 ${contentHtml}
+                <div class="asset-inline-actions">
+                    ${asset.assetType === 'creature' ? '<button class="btn btn-primary edit-creature-btn">Edit</button>' : ''}
+                    <button class="btn btn-delete delete-asset-btn">Delete</button>
+                </div>
             </div>`;
 
         setupExpansionToggle(card, asset);
 
         if (asset.assetType === 'creature') {
             const editBtn = card.querySelector('.edit-creature-btn');
-            if(editBtn) editBtn.addEventListener('click', () => redirectToCreatureEditor(asset.id));
+            if(editBtn) editBtn.addEventListener('click', (e) => { e.stopPropagation(); redirectToCreatureEditor(asset.id); });
         }
+        
         const deleteBtn = card.querySelector('.delete-asset-btn');
-        if(deleteBtn) deleteBtn.addEventListener('click', () => openDeleteConfirmationModal(asset.id, asset.name, asset.assetType));
+        if(deleteBtn) deleteBtn.addEventListener('click', (e) => { e.stopPropagation(); openDeleteConfirmationModal(asset.id, asset.name, asset.assetType); });
         
         if (asset.assetType === 'item' || asset.assetType === 'spell') {
+            let debounceTimer;
             card.querySelectorAll('input, textarea').forEach(el => {
                 el.addEventListener('input', (e) => {
-                    const field = e.target.dataset.field;
-                    if(field) {
-                        asset[field] = e.target.value;
-                        if (field === 'name') {
-                            const nameDisplayH3 = card.querySelector('.homebrew-asset-header h3');
-                            if(nameDisplayH3) nameDisplayH3.textContent = e.target.value || `New ${asset.assetType.charAt(0).toUpperCase() + asset.assetType.slice(1)}`;
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(() => {
+                        const field = e.target.dataset.field;
+                        const prefix = asset.assetType === 'item' ? ITEM_DATA_PREFIX : SPELL_DATA_PREFIX;
+                        const cookieName = `${prefix}${currentCampaignFullData.name}_${asset.id}`;
+                        
+                        const assetToUpdate = getCookie(cookieName);
+                        if (assetToUpdate && Object.prototype.hasOwnProperty.call(assetToUpdate, field)) {
+                            assetToUpdate[field] = e.target.value;
+                            setCookie(cookieName, assetToUpdate, 365);
+
+                            if (field === 'name') {
+                                card.querySelector('.homebrew-asset-header h3').textContent = e.target.value || `New ${asset.assetType}`;
+                            }
+
+                            if (saveStatusHomebrew) {
+                                saveStatusHomebrew.textContent = `Saved!`;
+                                setTimeout(() => { if (saveStatusHomebrew) saveStatusHomebrew.textContent = '' }, 1500);
+                            }
                         }
-                    }
-                    if (saveAllHomebrewBtn) saveAllHomebrewBtn.style.display = 'inline-block';
+                    }, 500);
                 });
             });
         }
         return card;
     }
-    
-    // Save All Button for items/spells
+
+    function renderHomebrewAssets(assetsToRender) {
+        if (!homebrewAssetsColumnsContainer) return;
+        homebrewAssetsColumnsContainer.innerHTML = '';
+        if (!assetsToRender || assetsToRender.length === 0) {
+            homebrewAssetsColumnsContainer.innerHTML = "<p>No homebrew assets match your current filters or none exist in this campaign.</p>";
+            return;
+        }
+        const columns = [];
+        for (let i = 0; i < NUM_COLUMNS; i++) {
+            const columnDiv = document.createElement('div');
+            columnDiv.className = 'asset-column';
+            columns.push(columnDiv);
+            homebrewAssetsColumnsContainer.appendChild(columnDiv);
+        }
+        assetsToRender.forEach((asset, index) => {
+            const columnIndex = index % NUM_COLUMNS;
+            const card = createAssetCard(asset);
+            if (columns[columnIndex]) columns[columnIndex].appendChild(card);
+        });
+    }
+
     if (saveAllHomebrewBtn) {
-        saveAllHomebrewBtn.addEventListener('click', () => {
-            saveHomebrewAssets('items');
-            saveHomebrewAssets('spells');
-            if(saveStatusHomebrew) {
-                saveStatusHomebrew.textContent = "Item and Spell changes saved.";
-                setTimeout(() => {if(saveStatusHomebrew) saveStatusHomebrew.textContent = ''}, 3000);
-            }
-            saveAllHomebrewBtn.style.display = 'none';
+        saveAllHomebrewBtn.style.display = 'none';
+    }
+
+    // --- Event Listeners for Controls ---
+    if(sortAssetsBySelect) sortAssetsBySelect.addEventListener('change', (e) => { currentSort.property = e.target.value; processAndRenderAssets(); });
+    if(reverseSortBtn) reverseSortBtn.addEventListener('click', () => { currentSort.reversed = !currentSort.reversed; reverseSortBtn.innerHTML = currentSort.reversed ? '&#x2191;' : '&#x2193;'; processAndRenderAssets(); });
+    if(filterPanel) {
+        filterPanel.querySelectorAll('input[type="checkbox"][data-filter-type]').forEach(checkbox => {
+            checkbox.addEventListener('change', (e) => {
+                const filterType = e.target.dataset.filterType;
+                if(currentFilters.hasOwnProperty(filterType)) {
+                    currentFilters[filterType] = e.target.checked;
+                    processAndRenderAssets();
+                }
+            });
         });
     }
 
     // --- Initial Page Load ---
     function initializeCatalogPage() {
-        const campaignName = getCookie(LAST_VIEWED_CAMPAIGN_KEY);
-        let campaignDataExists = false;
-        if (campaignName) {
-            const campaignDataString = getCookie(CAMPAIGN_DATA_PREFIX + campaignName);
-            if (campaignDataString) {
-                try {
-                    JSON.parse(campaignDataString);
-                    campaignDataExists = true;
-                } catch(e) {
-                    console.warn("Campaign data for", campaignName, "is corrupted. Clearing last viewed key.");
-                    setCookie(LAST_VIEWED_CAMPAIGN_KEY, '', -1);
-                }
-            }
-        }
-
-        if (!campaignDataExists && noCampaignModalHomebrew) {
-            openModal(noCampaignModalHomebrew);
-        }
-        
-        loadAllHomebrewAssets(); 
-        
-        if(reverseSortBtn) { 
-            reverseSortBtn.innerHTML = currentSort.reversed ? '&#x2191;' : '&#x2193;';
-            reverseSortBtn.title = currentSort.reversed ? "Sort Ascending" : "Sort Descending";
-        }
-
+        loadCampaignAndAssets();
     }
 
     initializeCatalogPage();
     
-    // Window click listener for closing modals
     window.addEventListener('click', (event) => {
-        if (customAddAssetDropdown && customAddAssetDropdown.style.display === 'block') {
-            if (addNewHomebrewAssetBtn && !addNewHomebrewAssetBtn.contains(event.target) && !customAddAssetDropdown.contains(event.target)) {
-                customAddAssetDropdown.style.display = 'none';
-            }
+        if (customAddAssetDropdown && customAddAssetDropdown.style.display === 'block' && !addNewHomebrewAssetBtn.contains(event.target)) {
+            customAddAssetDropdown.style.display = 'none';
         }
         if (noCampaignModalHomebrew && event.target === noCampaignModalHomebrew) closeModal(noCampaignModalHomebrew);
-        if (editCreatureModal && event.target === editCreatureModal) closeModal(editCreatureModal); // For the placeholder modal
         if (deleteAssetConfirmModal && event.target === deleteAssetConfirmModal) closeModal(deleteAssetConfirmModal);
-        if (addNewItemModal && event.target === addNewItemModal) { 
-            closeModal(addNewItemModal);
-            if(addNewItemForm) addNewItemForm.reset();
-        }
-        if (addNewSpellModal && event.target === addNewSpellModal) { 
-            closeModal(addNewSpellModal);
-            if(addNewSpellForm) addNewSpellForm.reset();
-        }
+        if (addNewItemModal && event.target === addNewItemModal) closeModal(addNewItemModal);
+        if (addNewSpellModal && event.target === addNewSpellModal) closeModal(addNewSpellModal);
     });
 });

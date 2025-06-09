@@ -10,16 +10,49 @@
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div id="settings">
+        <div class="settings-header">
+            <p>Settings</p>
+        </div>
+        <div class="settings-item">
+            <label class="toggle">
+                <input type="checkbox" id="dark-mode-toggle" name="btnToggle" />
+                <span id="dark-mode-slider" class="slider"></span>
+            </label>
+            <p>Dark Mode</p>
+        </div>
+        <div class="settings-item">
+            <label class="toggle">
+                <input type="checkbox" id="monospace-toggle" name="btnToggle" />
+                <span id="monospace-slider" class="slider"></span>
+            </label>
+            <p>Monospace Fonts</p>
+        </div>
+        <div class="settings-item">
+            <label class="toggle">
+                <input type="checkbox" id="contrast-toggle" name="btnToggle" />
+                <span id="contrast-slider" class="slider"></span>
+            </label>
+            <p>High Contrast</p>
+        </div>
+        <div class="settings-item">
+            <label class="toggle">
+                <input type="checkbox" id="nomotion-toggle" name="btnToggle" />
+                <span id="nomotion-slider" class="slider"></span>
+            </label>
+            <p>Reduced Motion</p>
+        </div>
+    </div>
     <header class="top-bar">
-        <div class="logo">Pathplanner 2e Help</div>
+        <div id="logo"><p id="hamburger">&equiv;</p><p>Pathplanner 2e Help</p></div>
         <nav>
             <ul>
-                <li><a href="">Home</a></li>
-                <li><a href="campaign">Campaign Details</a></li>
-                <li><a href="sessions">Sessions</a></li>
-                <li><a href="party">Party Management</a></li>
-                <li><a href="homebrew">Homebrew Catalog</a></li>
-                <li><a href="creature-generator">Creature Generator</a></li>
+                <li><a href="../">Home</a></li>
+                <li><a href="../campaign">Campaign Details</a></li>
+                <li><a href="../sessions">Sessions</a></li>
+                <li><a href="../party">Party Management</a></li>
+                <li><a href="../homebrew">Homebrew Catalog</a></li>
+                <li><a href="../creature-generator">Creature Generator</a></li>
             </ul>
         </nav>
     </header>
@@ -52,13 +85,24 @@
         <p>The Homebrew Catalog is a collection of user-created content that can be used in your campaigns. You can browse through the catalog, search for specific creatures or items, and add them to your campaign. To create a new homebrew asset, click on the "Homebrew" tab in the navigation header, or click "Homebrew" from the asset creation menu.</p>
         <h2 id="creature-generator">Creature Generator</h2>
         <p>The Creature Generator is a powerful tool that allows you to create custom creatures for your campaigns. You can adjust various attributes such as health, attack, and defense, and the generator will provide suggestions based on the level of the creature. Read more about how to use this advanced tool in the <a href="../creature-generator/guide">Creature Guide</a>.</p>
+        <h2 id="balanceing-campaigns">Balance and Progression in Campaigns</h2>
+        <p>Balance and progression is critical when making fun and innovative campaigns. Keeping balance in mind while designing creatures or planning sessions will help your players stay more engaged, as each session should feel like an enjoyable experience where each player makes measureable progress. This can involve picking up new items some sessions, while leveling up in others.</p>
+        <h3>Campaign Balance</h3>
+        <p></p>
+        <h3>Campaign Progression</h3>
+        <svg id="nonlinear-svg" style="width: 50%; height: auto; margin: -30px;"></svg>
     </main>
 
     <footer>
         <p>&copy; 2025 Pathplanner 2e. All rights reserved. This app is <a href="https://github.com/EvanderIV/pathplanner-2e" class="open-source-link" target="_blank">open source</a>.</p>
     </footer>
 </body>
+<script src="../js/controllers.js"></script>
 <script>
+
+
+
+
 function drawNonlinearGrowthSVG(targetElementId, options = {}) {
     const defaults = {
         // SVG and Drawing parameters

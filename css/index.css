@@ -1,3 +1,6 @@
+
+
+
 body {
     font-family: 'Lato', sans-serif;
     margin: 0;
@@ -9,6 +12,8 @@ body {
     min-height: 100vh;
 }
 
+
+
 /* Rustic Scroll/Parchment Background Idea */
 body::before {
     content: "";
@@ -19,15 +24,15 @@ body::before {
     height: 100%;
     z-index: -1;
     opacity: 0.6;
-    /* Uncomment and replace with your image path if you have one */
-    /* background-image: url('img/parchment-texture.jpg'); */
     background-image:
         linear-gradient(to bottom right, rgba(239, 220, 187, 0.1) 25%, transparent 25%, transparent 75%, rgba(239, 220, 187, 0.1) 75%, rgba(239, 220, 187, 0.1)),
         linear-gradient(to bottom right, rgba(210, 180, 140, 0.05) 25%, transparent 25%, transparent 75%, rgba(210, 180, 140, 0.05) 75%, rgba(210, 180, 140, 0.05));
     background-size: 20px 20px;
     background-position: 0 0, 10px 10px;
-    background-color: #f5e8c7; /* Base parchment */
+    background-color: #f5e8c7;
 }
+
+
 
 .open-source-link {
     color: #3a8ec2; /* Light blue text */
@@ -43,13 +48,146 @@ body::before {
     align-items: center;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     border-bottom: 3px solid #8a5a2c; /* Slightly lighter wood accent */
+    height: 5rem;
+    z-index: 10000;
 }
 
-.top-bar .logo {
+
+
+#logo {
     font-family: 'Merriweather', serif;
     font-size: 1.8em;
     font-weight: 700;
+    display: flex;
+    flex-direction: row;
+    cursor: pointer;
 }
+
+#hamburger {
+    font-size: 1.5em;
+    margin: 0;
+    margin-right: 20px;
+    align-self: center;
+    color: #f5e8c7; /* Parchment text */
+}
+
+
+
+
+#settings {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    height: 50em;
+    width: 25em;
+    top: -44em;
+    left: 0;
+    transition: top 0.3s ease;
+    z-index: 9999;
+    background-color: rgba(245, 232, 199, 0.85);
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    border: 1px solid #d2b48c;
+    border-radius: 0 0 8px 0;
+}
+
+
+
+#settings.expanded {
+    top: 6.5em; /* Show settings when expanded */
+}
+
+.settings-header {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    font-weight: bold;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.settings-header p {
+    font-size: 2em;
+    margin: 0 auto;
+}
+
+.settings-item {
+    width: 70%;
+    height: 3.25rem;
+    padding-left: 20%;
+    padding-right: 10%;
+    padding-top: 0.75rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: start;
+    transition: all 0.3s ease;
+}
+
+.settings-item p {
+    position: absolute;
+    font-size: 1.2em;
+    margin-left: 7rem;
+    margin-top: 0.25rem;
+    cursor: default;
+    font-weight: bold;
+}
+
+.settings-item:hover {
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+
+
+
+
+
+
+.toggle {
+	position: relative;
+	display: inline-block;
+	width: 4em;
+	height: 2.5em;
+}
+
+.toggle input {
+	display: none;
+}
+
+.slider {
+	position: absolute;
+	cursor: pointer;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: #444444;
+	transition: 0.4s;
+	border-radius: 3em;
+}
+
+.slider:before {
+	position: absolute;
+	content: "";
+	height: 2.25em;
+	width: 2.25em;
+	left: 0.125em;
+	bottom: 0.125em;
+	background-color: #FFFFFF;
+	transition: all 0.2s ease;
+	border-radius: 50%;
+}
+
+input:checked + .slider {
+	background-color: #3a8ec2;
+}
+
+input:checked + .slider:before {
+	transform: translateX(1.5em);
+}
+
+
+
 
 .top-bar nav ul {
     list-style: none;
@@ -95,6 +233,8 @@ body::before {
     border-radius: 8px;
     flex-grow: 1;
 }
+
+
 
 h1 {
     font-family: 'Merriweather', serif;
@@ -1038,7 +1178,10 @@ footer {
     border-bottom: 1px dashed #4a3b31; 
 }
 
-
+.lvlup-label {
+    width: 6rem;
+    text-align: right;
+}
 .session-header .level-up-group {
     display: flex;
     align-items: center;
@@ -1207,3 +1350,178 @@ h4 {
     margin-top: 2rem !important;
     margin-bottom: 0;
 }
+
+
+
+
+
+
+
+
+
+body.darkmode {
+    background-color: #0c1317;
+    color: #f5e8c7;
+}
+body.darkmode::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0.6;
+    background-image:
+        linear-gradient(to bottom right, rgba(2, 15, 31, 0.1) 25%, transparent 25%, transparent 75%, rgba(2, 15, 31, 0.1) 75%, rgba(2, 15, 31, 0.1)),
+        linear-gradient(to bottom right, rgba(1, 8, 26, 0.05) 25%, transparent 25%, transparent 75%, rgba(1, 8, 26, 0.05) 75%, rgba(1, 8, 26, 0.05));
+    background-size: 20px 20px;
+    background-position: 0 0, 10px 10px;
+    background-color: #00060e;
+}
+body.darkmode .top-bar {
+    background-color: #07141d;
+    color: #f5e8c7;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    border-bottom: 3px solid #083a5e;
+}
+body.darkmode #settings {
+    background-color: rgba(12, 19, 23, 0.85);
+}
+body.darkmode .container {
+    background-color: rgba(12, 19, 23, 0.85);
+    color: #f5e8c7 !important;
+}
+
+body.darkmode .container h1 {
+    color: #f5e8c7 !important;
+}
+
+body.darkmode #creatureForm fieldset {
+    background-color: rgba(12, 19, 23, 0.85);
+    border: 1px solid #2c4a6f;
+    color: #f5e8c7 !important;
+}
+
+body.darkmode #creatureForm legend {
+    color: #f5e8c7 !important;
+}
+
+body.darkmode .form-group label {
+    color: #f5e8c7 !important;
+}
+
+body.darkmode .stat-value-display {
+    color: #f5e8c7 !important;
+}
+
+body.darkmode #diagnosticsPanel {
+    background-color: rgba(12, 19, 23, 0.85);
+}
+
+body.darkmode .diagnostics-info-area h4,p,span {
+    color: #f5e8c7 !important;
+}
+
+body.darkmode .diagnostics-info-area h5 {
+    color: #f5e8c77e !important;
+}
+
+body.darkmode .diagnostics-info-area a {
+    color: #31e1d5 !important;
+}
+
+body.darkmode text.diag-label {
+    fill: #f5e8c7 !important;
+}
+
+body.darkmode .hexagon-background {
+    fill: rgba(142, 135, 119, 0.7) !important;
+}
+
+body.darkmode aside#suggestionsPanel {
+    background-color: rgba(12, 19, 23, 0.85) !important;
+}
+
+body.darkmode aside#suggestionsPanel h1,h2,h3,h4,p,span,strong {
+    color: #f5e8c7 !important;
+}
+
+body.darkmode .form-group input,select,textarea {
+    background-color: rgba(12, 19, 23, 0.85) !important;
+    color: #f5e8c7 !important;
+}
+
+body.darkmode .homebrew-asset-header {
+    background-color: #2c4a6f; /* Darker blue for asset header */
+}
+
+body.darkmode .homebrew-asset-content {
+    background-color: rgba(12, 19, 23, 0.85); /* Darker background for asset content */
+    color: #f5e8c7 !important;
+}
+
+body.darkmode .party-member-header {
+    background-color: #2c4a6f; /* Darker blue for asset header */
+}
+
+body.darkmode .party-member-details {
+    background-color: rgba(12, 19, 23, 0.85); /* Darker background for asset content */
+    color: #f5e8c7 !important;
+}
+
+body.darkmode .session-header {
+    background-color: #2c4a6f; /* Darker blue for asset header */
+}
+
+body.darkmode .session-header label,input {
+    color: #f5e8c7 !important;
+}
+
+body.darkmode .session-header input[type="number"] {
+    background-color: rgba(12, 19, 23, 0.85) !important;
+    color: #f5e8c7 !important;
+}
+
+body.darkmode .session-details {
+    background-color: rgba(12, 19, 23, 0.85); /* Darker background for asset content */
+    color: #f5e8c7 !important;
+}
+
+body.darkmode .sort-controls label {
+    color: #f5e8c7 !important;
+}
+
+body.darkmode .filter-group label {
+    color: #f5e8c7 !important;
+}
+
+body.monospace {
+    font-family: monospace !important; /* Force monospace font for all text */
+    font-size: large;
+}
+
+body.contrast {
+    filter: contrast(1.5);
+}
+
+body.nomotion {
+    animation: none !important;
+    transition: none !important;
+}
+
+body.nomotion * {
+    animation: none !important;
+    transition: none !important;
+}
+
+body.nomotion *::before {
+    animation: none !important;
+    transition: none !important;
+}
+
+body.nomotion *::after {
+    animation: none !important;
+    transition: none !important;
+}
+

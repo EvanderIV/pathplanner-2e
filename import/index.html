@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Campaign - Pathplanner 2e</title>
+    <link rel="icon" href="/games/img/pathplanner_icon.png">
+    <link rel="stylesheet" href="../css/index.css">
+    <meta name="darkreader-lock">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        .container {
+            max-width: 960px;
+            margin: auto;
+            padding-top: 2rem;
+            padding-bottom: 8rem; /* Space for sticky footer */
+        }
+        .file-upload-section {
+            background-color: #fdfdfd;
+            border: 2px dashed #cccccc;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .file-upload-section:hover {
+            background-color: #f7f7f7;
+            border-color: #aaaaaa;
+        }
+        /* Style for when a file is being dragged over the drop zone */
+        .file-upload-section.drag-over {
+            background-color: #e8f0fe !important;
+            border-color: #4a80e8 !important;
+        }
+        .file-upload-section p {
+            margin: 0;
+            font-family: 'Lato', sans-serif;
+            color: #555;
+            font-size: 1.1rem;
+        }
+        #importPreviewContainer {
+            display: none; /* Hidden by default */
+        }
+        .preview-section {
+            border: 1px solid #e0e0e0;
+            background-color: #fafafa;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .preview-section h2 {
+            margin-top: 0;
+            border-bottom: 2px solid #eeeeee;
+            padding-bottom: 0.5rem;
+            font-family: 'Merriweather', serif;
+            color: #333;
+        }
+        .preview-section ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .preview-section li {
+            background-color: #ffffff;
+            border: 1px solid #e8e8e8;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Lato', sans-serif;
+        }
+        .preview-section li .detail-label {
+            color: #666;
+            font-size: 0.9em;
+            font-style: italic;
+        }
+        .sticky-footer {
+            position: sticky;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.98);
+            padding: 1rem;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            border-top: 1px solid #e0e0e0;
+            display: none; /* Hidden by default */
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div id="settings">
+        <div class="settings-header">
+            <p>Settings</p>
+        </div>
+        <div class="settings-item">
+            <label class="toggle">
+                <input type="checkbox" id="dark-mode-toggle" name="btnToggle" />
+                <span id="dark-mode-slider" class="slider"></span>
+            </label>
+            <p>Dark Mode</p>
+        </div>
+        <div class="settings-item">
+            <label class="toggle">
+                <input type="checkbox" id="monospace-toggle" name="btnToggle" />
+                <span id="monospace-slider" class="slider"></span>
+            </label>
+            <p>Monospace Fonts</p>
+        </div>
+        <div class="settings-item">
+            <label class="toggle">
+                <input type="checkbox" id="contrast-toggle" name="btnToggle" />
+                <span id="contrast-slider" class="slider"></span>
+            </label>
+            <p>High Contrast</p>
+        </div>
+        <div class="settings-item">
+            <label class="toggle">
+                <input type="checkbox" id="nomotion-toggle" name="btnToggle" />
+                <span id="nomotion-slider" class="slider"></span>
+            </label>
+            <p>Reduced Motion</p>
+        </div>
+    </div>
+    <header class="top-bar">
+        <div id="logo"><p id="hamburger">&equiv;</p><p>Pathplanner 2e</p></div>
+        <nav>
+            <ul>
+                <li><a href="../">Home</a></li>
+                <li><a href="../campaign">Campaign Details</a></li>
+                <li><a href="../sessions">Sessions</a></li>
+                <li><a href="../party">Party Management</a></li>
+                <li><a href="../homebrew">Homebrew Catalog</a></li>
+                <li><a href="../creature-generator">Creature Generator</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>Review & Import Campaign</h1>
+        
+        <div id="fileUploadSection" class="file-upload-section">
+            <p>Click here or drag & drop a .pathplanner.json file to begin.</p>
+            <input type="file" id="campaignFileInput" accept=".json,.pathplanner" style="display: none;">
+        </div>
+
+        <div id="importPreviewContainer">
+            <div id="campaignDetailsPreview" class="preview-section">
+                <h2>Campaign Details</h2>
+                <ul>
+                    </ul>
+            </div>
+
+            <div id="homebrewAssetsPreview" class="preview-section">
+                <h2>Homebrew Assets</h2>
+                <ul id="homebrewList">
+                    </ul>
+            </div>
+            
+            <div id="partyMembersPreview" class="preview-section">
+                <h2>Party Members</h2>
+                <ul id="partyMemberList">
+                    </ul>
+            </div>
+
+            <div id="sessionsPreview" class="preview-section">
+                <h2>Sessions</h2>
+                <ul id="sessionList">
+                    </ul>
+            </div>
+        </div>
+    </main>
+
+    <div id="stickyFooter" class="sticky-footer">
+        <button id="finishImportingBtn" class="btn">Finish Importing</button>
+    </div>
+
+    <footer class="main-footer">
+        <p>&copy; 2025 Pathplanner 2e. All rights reserved. This app is <a href="https://github.com/EvanderIV/pathplanner-2e" class="open-source-link" target="_blank">open source</a>.</p>
+    </footer>
+
+    <script src="js/import.js"></script>
+</body>
+<script src="../js/controllers.js"></script>
+</html>

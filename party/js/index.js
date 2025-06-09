@@ -230,6 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (campaignDataString) {
             try {
                 currentCampaignFullData = JSON.parse(campaignDataString);
+                if (!currentCampaignFullData.homebrewAssets) currentCampaignFullData.homebrewAssets = { creatures: [], items: [], spells: [] };
                 if (!currentCampaignFullData.partyMembers) currentCampaignFullData.partyMembers = [];
                 if (!currentCampaignFullData.sessions) currentCampaignFullData.sessions = []; // Ensure sessions array
 
