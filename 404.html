@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>General Guide - Pathplanner 2e</title>
+    <link rel="icon" href="/games/img/pathplanner_icon.png">
+    <link rel="stylesheet" href="css/index.css">
+    <meta name="darkreader-lock">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="settings">
+        <div class="settings-header">
+            <p>Settings</p>
+        </div>
+        <div class="settings-item">
+            <label class="toggle">
+                <input type="checkbox" id="dark-mode-toggle" name="btnToggle" />
+                <span id="dark-mode-slider" class="slider"></span>
+            </label>
+            <p>Dark Mode</p>
+        </div>
+        <div class="settings-item">
+            <label class="toggle">
+                <input type="checkbox" id="monospace-toggle" name="btnToggle" />
+                <span id="monospace-slider" class="slider"></span>
+            </label>
+            <p>Monospace Fonts</p>
+        </div>
+        <div class="settings-item">
+            <label class="toggle">
+                <input type="checkbox" id="contrast-toggle" name="btnToggle" />
+                <span id="contrast-slider" class="slider"></span>
+            </label>
+            <p>High Contrast</p>
+        </div>
+        <div class="settings-item">
+            <label class="toggle">
+                <input type="checkbox" id="nomotion-toggle" name="btnToggle" />
+                <span id="nomotion-slider" class="slider"></span>
+            </label>
+            <p>Reduced Motion</p>
+        </div>
+    </div>
+    <header class="top-bar">
+        <div id="logo"><p id="hamburger">&equiv;</p><p>Pathplanner 2e Help</p></div>
+        <nav>
+            <ul>
+                <li><a href="../">Home</a></li>
+                <li><a href="../campaign">Campaign Details</a></li>
+                <li><a href="../sessions">Sessions</a></li>
+                <li><a href="../party">Party Management</a></li>
+                <li><a href="../homebrew">Homebrew Catalog</a></li>
+                <li><a href="../creature-generator">Creature Generator</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main id="guide-container" class="container" style="display: flex; flex-direction: column;">
+        <p style="align-self: center; justify-self: center; font-size: 12em; margin: 0 auto; height: fit-content; margin-top: 0.25em;">404</p>
+        <p style="align-self: center; justify-self: center; font-size: 8em; margin: 0 auto; height: fit-content;">NOT FOUND</p>
+        <p style="align-self: center; justify-self: center; font-size: 2.5em; margin: 0 auto; height: fit-content; text-align: center;" id="random-line">“You're lost.”</p>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Pathplanner 2e. All rights reserved. This app is <a href="https://github.com/EvanderIV/pathplanner-2e" class="open-source-link" target="_blank">open source</a>.</p>
+    </footer>
+</body>
+<script src="js/controllers.js"></script>
+<script>
+    let randomQuote = [
+        "“Not all those who wander are lost.”",
+        "“I'm not lost, I'm just exploring alternative routes!”",
+        "“I'm lost, and I blame the GPS”",
+        "“I'm lost, and I'm not even sure where I was going”",
+        "“I thought I knew where I was going, but then I realized I was just following the wrong map”",
+        "“I thought I was lost, but then I realized I was just taking the scenic route”",
+        "“I thought I was lost, but then I realized I was just taking a detour”",
+        "“I'm lost, but I'm making great time”",
+        "“I'm lost, but I'm having a great time”"
+    ];
+    let randomIndex = Math.floor(Math.random() * randomQuote.length);
+    document.getElementById("random-line").innerText = randomQuote[randomIndex];
+</script>
+</html>

@@ -1,0 +1,8 @@
+# BEGIN Custom Error Pages
+# This line sets the custom 404 error document.
+# If a file or directory is not found, the server will display the 404.html file.
+# The path is relative to the website's root directory.
+
+ErrorDocument 404 /apps/pathplanner-2e/404.html
+
+# END Custom Error Pages
